@@ -1,6 +1,5 @@
 
 var url = new URL(document.URL);
-var userid;
 var hideMessages = parseInt(url.searchParams.get("hideMessages"));
 var testMode = parseInt(url.searchParams.get("testMode"));
 if (hideMessages === NaN) hideMessages = 0;
@@ -18,16 +17,16 @@ async function start() {
 	else
 		token = localStorage.getItem("twitchChatToken")
 
-	userid = await getUserId();
-	console.log(userid);
-	channel_badge_sets = await getChannelBadges();
+	const {user_id, login} = await getUserInfos();
+	console.log(user_id);
+	channel_badge_sets = await getChannelBadges(user_id);
 	glogal_badge_sets = await getGlobalBadges();
 	console.log(glogal_badge_sets);
 	console.log(channel_badge_sets);
-	start_chat();
+	start_chat(login);
 }
 
-function start_chat() {
+function start_chat(login) {
 	if (token != "") {
 		const client = new tmi.Client({
 			options: { debug: true, messagesLogLevel: "info" },
@@ -36,10 +35,10 @@ function start_chat() {
 				secure: true
 			},
 			identity: {
-				username: 'syntax_err0r',
+				username: login,
 				password: token
 			},
-			channels: ['syntax_err0r']
+			channels: [login]
 
 		});
 		client.connect().catch(console.error);
@@ -74,7 +73,7 @@ function start_chat() {
 	}
 }
 
-function getUserId() {
+function getUserInfos() {
 	return fetch(`https://id.twitch.tv/oauth2/validate`, {
 		headers: new Headers({
 			'Authorization': 'Bearer ' + token.split(':')[1],
@@ -82,12 +81,12 @@ function getUserId() {
 	})
 		.then(response => response.json())
 		.then(data => {
-			return data.user_id;
+			return data;
 		})
 }
 
-function getChannelBadges() {
-	return fetch(`https://badges.twitch.tv/v1/badges/channels/${userid}/display`)
+function getChannelBadges(user_id) {
+	return fetch(`https://badges.twitch.tv/v1/badges/channels/${user_id}/display`)
 		.then(response => response.json())
 		.then(data => {
 			return data.badge_sets;
