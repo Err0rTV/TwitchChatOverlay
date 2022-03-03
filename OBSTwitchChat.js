@@ -1,14 +1,6 @@
-function getEmoteImg(emoteId) {
-	return "<img class=\"chatEmote\" src=\"https://static-cdn.jtvnw.net/emoticons/v2/" + emoteId + "/default/dark/3.0\">"
-}
 
-function subStringReplace(string, replaceString, start, end) {
-	let newString = string.substring(0, start);
-	newString += replaceString;
-	newString += string.substring(end, string.length)
-	return newString;
-}
-
+var url = new URL(document.URL);
+var userid;
 
 
 
@@ -102,7 +94,16 @@ client.on('message', (channel, tags, message, self) => {
 
 
 
+function getEmoteImg(emoteId) {
+	return `<img class="chatEmote" src="https://static-cdn.jtvnw.net/emoticons/v2/${emoteId}/default/dark/3.0>`;
+}
 
+function subStringReplace(string, replaceString, start, end) {
+	let newString = string.substring(0, start);
+	newString += replaceString;
+	newString += string.substring(end, string.length)
+	return newString;
+}
 
 var user_color = new Map();
 
