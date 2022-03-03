@@ -221,29 +221,6 @@ function fade(li) {
 		})
 }
 
-async function testmsg() {
-	const dumyText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi. Proin porttitor, orci nec nonummy molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat. Duis semper. Duis arcu massa, scelerisque vitae, consequat in, pretium a, enim. Pellentesque congue. Ut in risus volutpat libero pharetra tempor. Cras vestibulum bibendum augue. Praesent egestas leo in pede. Praesent blandit odio eu enim. Pellentesque sed dui ut augue blandit sodales. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Aliquam nibh. Mauris ac mauris sed pede pellentesque fermentum. Maecenas adipiscing ante non diam sodales hendrerit.";
-
-
-	let dumybadges = [
-		"https://static-cdn.jtvnw.net/badges/v1/5527c58c-fb7d-422d-b71b-f309dcb85cc1/2",
-		"https://static-cdn.jtvnw.net/badges/v1/92b7d84f-64b5-4150-9761-6e599ccd6d4c/2"
-	];
-
-	let name = new Object();
-	name.userId = dumyText.replace(" ", "").substring(0, 4 + Math.random() * 21);
-	name.color = "";
-
-
-	let color = choose_user_color(name);
-
-	showMsg("", dumybadges, name.userId, color, dumyText.substring(0, Math.random() * 50));
-	var t = setTimeout(() => { testmsg(); }, 100 + Math.random() * 15000);
-}
-// testmsg();
-
-
-
 async function showMsg(id, badges, name, nameColor, msg) {
 	let txt = "";
 	//<tr><td style='white-space: nowrap; vertical-align:top;'>";
@@ -296,12 +273,21 @@ async function showMsg(id, badges, name, nameColor, msg) {
 	// message
 	txt += msg;
 
-	txt += "</div>";
-	txt += "</div>";
+async function testmsg() {
+	const dumyText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi. Proin porttitor, orci nec nonummy molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat. Duis semper. Duis arcu massa, scelerisque vitae, consequat in, pretium a, enim. Pellentesque congue. Ut in risus volutpat libero pharetra tempor. Cras vestibulum bibendum augue. Praesent egestas leo in pede. Praesent blandit odio eu enim. Pellentesque sed dui ut augue blandit sodales. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Aliquam nibh. Mauris ac mauris sed pede pellentesque fermentum. Maecenas adipiscing ante non diam sodales hendrerit.";
 
+	let dumybadges = {
+		"broadcaster": "1",
+		"subscriber": "12"
+	};
 
-	add(id, txt + "<br>");
+	let name = new Object();
+	name.userId = dumyText.replace(" ", "").substring(0, 4 + Math.random() * 21);
+	name.color = "";
+
+	let color = choose_user_color(name);
+
+	showMsg("", dumybadges, name.userId, color, dumyText.substring(0, Math.random() * 50));
+	var t = setTimeout(() => { testmsg(); }, 100 + Math.random() * 15000);
 }
-
-
 
