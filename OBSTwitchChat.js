@@ -1,26 +1,10 @@
 
 var url = new URL(document.URL);
 var userid;
-
-
-
-
-
-let url_string = document.URL
-console.log(document.URL);
-
-var url = new URL(url_string);
-var c = url.searchParams.get("test");
-var userid = parseInt(url.searchParams.get("userid"));
 var hideMessages = parseInt(url.searchParams.get("hideMessages"));
 var testMode = parseInt(url.searchParams.get("testMode"));
 if (hideMessages === NaN) hideMessages = 0;
-
-console.log(c);
-
-// window.localStorage.setItem("twitchChatTocken", "")
-
-let tocken;
+var token;
 
 
 var glogal_badge_sets = new Object();
