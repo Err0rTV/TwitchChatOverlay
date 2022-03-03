@@ -226,52 +226,40 @@ async function showMsg(id, badges, name, nameColor, msg) {
 	//<tr><td style='white-space: nowrap; vertical-align:top;'>";
 	console.log("visibilityState: " + document.visibilityState);
 
-	txt += "<div style='background: rgba(77, 77, 77, 0.4);' class='chatMsgContener'>";
-
-	txt += "<div class='charMsgText' style='color:";
-
-	// color
-	txt += nameColor;
-
-	txt += ";'>";
-	txt += "<strong>";
-
-	// displayName
-	txt += name;
-
-	txt += "</strong>";
-	txt += "</div>";
-	if (badges != null)
-		if (Object.keys(badges).length > 0)
-			txt += "<div class='charMsgText'>";
 	// badges
+	let htmlBadges = "";
+	if (badges != null) {
+		if (Object.keys(badges).length > 0)
+			htmlBadges += "<div class='charMsgText'>";
 
-	if (badges != null)
 		Object.entries(badges).forEach(([key, value]) => {
 
-			txt += "<img class='chatBadge' src='";
 			console.log(channel_badge_sets[key]);
-
+			let badge;
 			if (channel_badge_sets[key] != null) {
 				if (channel_badge_sets[key].versions[value] != undefined)
-					txt += channel_badge_sets[key].versions[value].image_url_4x;
+					badge = channel_badge_sets[key].versions[value].image_url_4x;
 				else
-					txt += glogal_badge_sets[key].versions[value].image_url_4x;
+					badge = glogal_badge_sets[key].versions[value].image_url_4x;
 			}
 			else
-				txt += glogal_badge_sets[key].versions[value].image_url_4x;
+				badge = glogal_badge_sets[key]?.versions[value].image_url_4x;
 
-			txt += "''>";
-			//console.log(txt);
+			htmlBadges += `<img class='chatBadge' src='${badge}'>`;
 		});
 
-	if (badges != null)
 		if (Object.keys(badges).length > 0)
-			txt += "</div>";
-	txt += "<div class='charMsgText'>";
+			htmlBadges += `</div>`;
+	}
+	txt += `<div style='background: rgba(77, 77, 77, 0.4);' class='chatMsgContener'>
+						<div class='charMsgText' style='color:${nameColor};'><strong>${name}</strong>
+						</div>${htmlBadges}
+						<div class='charMsgText'>${msg}</div>
+					</div>`;
 
-	// message
-	txt += msg;
+	add(id, txt + "<br>");
+}
+
 
 async function testmsg() {
 	const dumyText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi. Proin porttitor, orci nec nonummy molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat. Duis semper. Duis arcu massa, scelerisque vitae, consequat in, pretium a, enim. Pellentesque congue. Ut in risus volutpat libero pharetra tempor. Cras vestibulum bibendum augue. Praesent egestas leo in pede. Praesent blandit odio eu enim. Pellentesque sed dui ut augue blandit sodales. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Aliquam nibh. Mauris ac mauris sed pede pellentesque fermentum. Maecenas adipiscing ante non diam sodales hendrerit.";
