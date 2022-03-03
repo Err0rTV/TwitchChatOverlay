@@ -13,6 +13,7 @@ var url = new URL(url_string);
 var c = url.searchParams.get("test");
 var userid = parseInt(url.searchParams.get("userid"));
 var hideMessages = parseInt(url.searchParams.get("hideMessages"));
+var testMode = parseInt(url.searchParams.get("testMode"));
 if (hideMessages === NaN) hideMessages = 0;
 
 console.log(c);
@@ -280,3 +281,5 @@ async function testmsg() {
 	var t = setTimeout(() => { testmsg(); }, 100 + Math.random() * 15000);
 }
 
+if (testMode === 1)
+	testmsg();
