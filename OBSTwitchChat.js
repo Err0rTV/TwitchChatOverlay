@@ -21,79 +21,102 @@ console.log(c);
 // window.localStorage.setItem("twitchChatTocken", "")
 
 let tocken;
-if (url.searchParams.has("twitchChatTocken"))
-	tocken = url.searchParams.get("twitchChatTocken")
-else
-	tocken = localStorage.getItem("twitchChatTocken")
-
 
 
 var glogal_badge_sets = new Object();
 var channel_badge_sets = new Object();
 
-fetch("https://badges.twitch.tv/v1/badges/channels/237719570/display")
-	.then(response => response.json())
-	.then(data => {
-		channel_badge_sets = data.badge_sets;
-		console.log(data.badge_sets);
-	})
+async function start() {
+	if (url.searchParams.has("twitchChatToken")) {
+		token = url.searchParams.get("twitchChatToken")
+		localStorage.setItem("twitchChatToken", token)
+	}
+	else
+		token = localStorage.getItem("twitchChatToken")
 
+	userid = await getUserId();
+	console.log(userid);
+	channel_badge_sets = await getChannelBadges();
+	glogal_badge_sets = await getGlobalBadges();
+	console.log(glogal_badge_sets);
+	console.log(channel_badge_sets);
+	start_chat();
+}
 
-fetch("https://badges.twitch.tv/v1/badges/global/display")
-	.then(response => response.json())
-	.then(data => {
-		glogal_badge_sets = data.badge_sets;
-		console.log(glogal_badge_sets);
-	})
+function start_chat() {
+	if (token != "") {
+		const client = new tmi.Client({
+			options: { debug: true, messagesLogLevel: "info" },
+			connection: {
+				reconnect: true,
+				secure: true
+			},
+			identity: {
+				username: 'syntax_err0r',
+				password: token
+			},
+			channels: ['syntax_err0r']
 
-
-
-
-
-const client = new tmi.Client({
-	options: { debug: true, messagesLogLevel: "info" },
-	connection: {
-		reconnect: true,
-		secure: true
-	},
-	identity: {
-		username: 'syntax_err0r',
-		password: tocken
-	},
-	channels: ['syntax_err0r']
-
-});
-client.connect().catch(console.error);
-
-client.on('message', (channel, tags, message, self) => {
-	if (tags.emotes != null) {
-		let map = new Array();
-		Object.entries(tags.emotes).forEach(([key, value]) => {
-			console.log(key + " " + value);
-			let emoteIMG = getEmoteImg(key);
-
-
-			value.forEach(e => {
-				let s = e.split('-');
-				map.push({ start: parseInt(s[0]), end: parseInt(s[1]), emoteIMG: getEmoteImg(key) });
-			});
 		});
+		client.connect().catch(console.error);
 
-		map.sort((firstEl, secondEl) => {
-			return secondEl.start - firstEl.start;
-		});
-		map.forEach(e => {
-			message = subStringReplace(message, e.emoteIMG, e.start, (e.end + 1));
-			console.log(e.start + " " + (e.end + 1) + " " + message);
+		client.on('message', (channel, tags, message, self) => {
+			if (tags.emotes != null) {
+				let map = new Array();
+				Object.entries(tags.emotes).forEach(([key, value]) => {
+					console.log(key + " " + value);
+					let emoteIMG = getEmoteImg(key);
+
+
+					value.forEach(e => {
+						let s = e.split('-');
+						map.push({ start: parseInt(s[0]), end: parseInt(s[1]), emoteIMG: getEmoteImg(key) });
+					});
+				});
+
+				map.sort((firstEl, secondEl) => {
+					return secondEl.start - firstEl.start;
+				});
+				map.forEach(e => {
+					message = subStringReplace(message, e.emoteIMG, e.start, (e.end + 1));
+					console.log(e.start + " " + (e.end + 1) + " " + message);
+				});
+			}
+
+			console.log(message);
+			console.log(tags);
+			showMsg(tags.id, tags.badges, tags["display-name"], tags.color ? tags.color : choose_user_color(tags["user-id"]), message)
 		});
 	}
+}
 
-	console.log(message);
-	console.log(tags);
-	showMsg(tags.id, tags.badges, tags["display-name"], tags.color ? tags.color : choose_user_color(tags["user-id"]), message)
-});
+function getUserId() {
+	return fetch(`https://id.twitch.tv/oauth2/validate`, {
+		headers: new Headers({
+			'Authorization': 'Bearer ' + token.split(':')[1],
+		}),
+	})
+		.then(response => response.json())
+		.then(data => {
+			return data.user_id;
+		})
+}
 
+function getChannelBadges() {
+	return fetch(`https://badges.twitch.tv/v1/badges/channels/${userid}/display`)
+		.then(response => response.json())
+		.then(data => {
+			return data.badge_sets;
+		})
+}
 
+function getGlobalBadges() {
+	return fetch("https://badges.twitch.tv/v1/badges/global/display")
+		.then(response => response.json())
+		.then(data => {
+			return data.badge_sets;
+		})
+}
 
 function getEmoteImg(emoteId) {
 	return `<img class="chatEmote" src="https://static-cdn.jtvnw.net/emoticons/v2/${emoteId}/default/dark/3.0>`;
@@ -283,3 +306,5 @@ async function testmsg() {
 
 if (testMode === 1)
 	testmsg();
+else
+	start();
