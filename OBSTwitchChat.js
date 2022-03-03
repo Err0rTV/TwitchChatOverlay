@@ -33,25 +33,6 @@ if (url.searchParams.has("twitchChatTocken"))
 else
 	tocken = localStorage.getItem("twitchChatTocken")
 
-/*
-		let bearer = `Bearer ${tocken}`;
-	fetch("https://api.twitch.tv/helix/users?login=syntax_err0r", {
-		headers: { 'Client-ID': tocken }
-	})
-		.then(response => response.json())
-		.then(data => {
-			console.log(data);
-
-			fetch("https://api.twitch.tv/kraken/chat/<channel ID>/badges", {
-				headers: { Authorization: bearer}
-			})
-				.then(response => response.json())
-				.then(data => {
-
-					console.log(data)
-				});
-		});
-*/
 
 
 var glogal_badge_sets = new Object();
@@ -192,21 +173,17 @@ function add(id, txt) {
 		li.className = "fade div show_noannim";
 	}
 
-	// --disable-backgrounding-occluded-windows --disable-background-timer-throttling
-
 	if (hideMessages === 1) {
 		console.log("22");
 		setTimeout(async () => {
 			console.log("hide message");
 			if (document.visibilityState === "visible") {
-				// console.log("anim");
 				li.className = "fade div hide";
 				setTimeout(async () => {
 					// li.remove();
 				}, 2000);
 			}
 			else {
-				// console.log("noanim");
 				li.className = "fade div hide_noannim";
 				// li.remove();
 			}
@@ -243,15 +220,6 @@ function fade(li) {
 			fade(li);
 		})
 }
-/*
-setInterval(()=>{
-	let dumybadges = [
-				"https://static-cdn.jtvnw.net/badges/v1/5527c58c-fb7d-422d-b71b-f309dcb85cc1/2",
-				"https://static-cdn.jtvnw.net/badges/v1/92b7d84f-64b5-4150-9761-6e599ccd6d4c/2"
-			];
-	showMsg(dumybadges, "test", "#777700", "t <img class='chatEmote' src='https://static-cdn.jtvnw.net/emoticons/v1/64138/1.0'> t <img class='chatEmote' src='https://static-cdn.jtvnw.net/emoticons/v1/425618/1.0'>");
-}, 2000);
-*/
 
 async function testmsg() {
 	const dumyText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi. Proin porttitor, orci nec nonummy molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat. Duis semper. Duis arcu massa, scelerisque vitae, consequat in, pretium a, enim. Pellentesque congue. Ut in risus volutpat libero pharetra tempor. Cras vestibulum bibendum augue. Praesent egestas leo in pede. Praesent blandit odio eu enim. Pellentesque sed dui ut augue blandit sodales. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Aliquam nibh. Mauris ac mauris sed pede pellentesque fermentum. Maecenas adipiscing ante non diam sodales hendrerit.";
