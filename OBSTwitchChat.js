@@ -111,7 +111,7 @@ function getGlobalBadges() {
 }
 
 function getEmoteImg(emoteId) {
-	return `<img class="chatEmote" src="https://static-cdn.jtvnw.net/emoticons/v2/${emoteId}/default/dark/3.0>`;
+	return `<img class="chatEmote" src="https://static-cdn.jtvnw.net/emoticons/v2/${emoteId}/default/dark/3.0">`;
 }
 
 function subStringReplace(string, replaceString, start, end) {
