@@ -27,6 +27,9 @@ async function start() {
 	}
 	console.log(channel_badge_sets);
 
+	if (testMode === 1){
+		testmsg();
+	}	
 }
 
 function start_chat(login,client_id) {
@@ -315,7 +318,5 @@ async function testmsg() {
 	var t = setTimeout(() => { testmsg(); }, 100 + Math.random() * 15000);
 }
 
-if (testMode === 1)
-	testmsg();
-else
-	start();
+
+start();
