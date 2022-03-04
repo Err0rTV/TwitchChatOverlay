@@ -1,4 +1,4 @@
-# TwitchChatOverlay
+# Twitch Chat Overlay
 
 ## Installation
 
