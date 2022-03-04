@@ -3,7 +3,7 @@ var url = new URL(document.URL);
 var hideMessages = parseInt(url.searchParams.get("hideMessages"));
 var testMode = parseInt(url.searchParams.get("testMode"));
 if (hideMessages === NaN) hideMessages = 0;
-var token;
+var token = "";
 
 
 var glogal_badge_sets = new Object();
@@ -17,13 +17,16 @@ async function start() {
 	else
 		token = localStorage.getItem("twitchChatToken")
 
-	const {user_id, login, client_id} = await getUserInfos();
-	console.log(user_id);
-	channel_badge_sets = await getChannelBadges(user_id);
 	glogal_badge_sets = await getGlobalBadges();
 	console.log(glogal_badge_sets);
+	if (token != "") {
+		const { user_id, login, client_id } = await getUserInfos(token);
+		console.log(user_id);
+		channel_badge_sets = await getChannelBadges(user_id);
+		start_chat(login, client_id);
+	}
 	console.log(channel_badge_sets);
-	start_chat(login,client_id);
+
 }
 
 function start_chat(login,client_id) {
@@ -90,7 +93,7 @@ function start_chat(login,client_id) {
 	}
 }
 
-function getUserInfos() {
+function getUserInfos(token) {
 	return fetch(`https://id.twitch.tv/oauth2/validate`, {
 		headers: new Headers({
 			'Authorization': 'Bearer ' + token.split(':')[1],
