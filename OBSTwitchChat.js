@@ -17,19 +17,22 @@ async function start() {
 	else
 		token = localStorage.getItem("twitchChatToken")
 
-	const {user_id, login} = await getUserInfos();
+	const {user_id, login, client_id} = await getUserInfos();
 	console.log(user_id);
 	channel_badge_sets = await getChannelBadges(user_id);
 	glogal_badge_sets = await getGlobalBadges();
 	console.log(glogal_badge_sets);
 	console.log(channel_badge_sets);
-	start_chat(login);
+	start_chat(login,client_id);
 }
 
-function start_chat(login) {
+function start_chat(login,client_id) {
 	if (token != "") {
 		const client = new tmi.Client({
-			options: { debug: true, messagesLogLevel: "info" },
+			options: { debug: true, 
+				messagesLogLevel: "info",
+				clientId: client_id
+			},
 			connection: {
 				reconnect: true,
 				secure: true
@@ -43,6 +46,11 @@ function start_chat(login) {
 		});
 		client.connect().catch(console.error);
 
+
+		client.on('emotesets', (sets, obj) => {
+			console.log(sets);
+			console.log(obj);
+		});
 
 		client.on('messagedeleted', (channel, _username2, deletedMessage, tags) => {
 			console.log(channel);

@@ -1,49 +1,39 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
-"use strict";
-
-var client = require('./lib/client');
+const client = require('./lib/client');
 
 module.exports = {
-  client: client,
+  client,
   Client: client
 };
 
 },{"./lib/client":3}],2:[function(require,module,exports){
-"use strict";
+const fetch = require('node-fetch');
 
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-var fetch = require('node-fetch');
-
-var _ = require('./utils');
+const _ = require('./utils');
 
 module.exports = function api(options, callback) {
   // Set the url to options.uri or options.url..
-  var url = options.url !== undefined ? options.url : options.uri; // Make sure it is a valid url..
+  let url = options.url !== undefined ? options.url : options.uri; // Make sure it is a valid url..
 
   if (!_.isURL(url)) {
-    url = "https://api.twitch.tv/kraken".concat(url[0] === '/' ? url : "/".concat(url));
+    url = `https://api.twitch.tv/helix${url[0] === '/' ? url : `/${url}`}`;
   } // We are inside a Node application, so we can use the node-fetch module..
 
 
   if (_.isNode()) {
-    var opts = Object.assign({
+    const opts = Object.assign({
       method: 'GET',
       json: true
     }, options);
 
     if (opts.qs) {
-      var qs = new URLSearchParams(opts.qs);
-      url += "?".concat(qs);
+      const qs = new URLSearchParams(opts.qs);
+      url += `?${qs}`;
     }
     /** @type {import('node-fetch').RequestInit} */
 
 
-    var fetchOptions = {};
+    const fetchOptions = {};
 
     if ('fetchAgent' in this.opts.connection) {
       fetchOptions.agent = this.opts.connection.fetchAgent;
@@ -51,43 +41,38 @@ module.exports = function api(options, callback) {
     /** @type {ReturnType<import('node-fetch')['default']>} */
 
 
-    var fetchPromise = fetch(url, _objectSpread(_objectSpread({}, fetchOptions), {}, {
+    const fetchPromise = fetch(url, { ...fetchOptions,
       method: opts.method,
       headers: opts.headers,
       body: opts.body
-    }));
-    var response = {};
-    fetchPromise.then(function (res) {
+    });
+    let response = {};
+    fetchPromise.then(res => {
       response = {
         statusCode: res.status,
         headers: res.headers
       };
       return opts.json ? res.json() : res.text();
-    }).then(function (data) {
-      return callback(null, response, data);
-    }, function (err) {
-      return callback(err, response, null);
-    });
+    }).then(data => callback(null, response, data), err => callback(err, response, null));
   } // Web application, extension, React Native etc.
   else {
-    var _opts = Object.assign({
+    const opts = Object.assign({
       method: 'GET',
       headers: {}
     }, options, {
-      url: url
+      url
     }); // prepare request
 
+    const xhr = new XMLHttpRequest();
+    xhr.open(opts.method, opts.url, true);
 
-    var xhr = new XMLHttpRequest();
-    xhr.open(_opts.method, _opts.url, true);
-
-    for (var name in _opts.headers) {
-      xhr.setRequestHeader(name, _opts.headers[name]);
+    for (const name in opts.headers) {
+      xhr.setRequestHeader(name, opts.headers[name]);
     }
 
     xhr.responseType = 'json'; // set request handler
 
-    xhr.addEventListener('load', function (_ev) {
+    xhr.addEventListener('load', _ev => {
       if (xhr.readyState === 4) {
         if (xhr.status !== 200) {
           callback(xhr.status, null, null);
@@ -103,49 +88,29 @@ module.exports = function api(options, callback) {
 
 },{"./utils":9,"node-fetch":10}],3:[function(require,module,exports){
 (function (global){(function (){
-"use strict";
+const _global = typeof global !== 'undefined' ? global : typeof window !== 'undefined' ? window : {};
 
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
+const _WebSocket = _global.WebSocket || require('ws');
 
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+const _fetch = _global.fetch || require('node-fetch');
 
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+const api = require('./api');
 
-function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+const commands = require('./commands');
 
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+const EventEmitter = require('./events').EventEmitter;
 
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+const logger = require('./logger');
 
-function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+const parse = require('./parser');
 
-function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+const Queue = require('./timer');
 
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+const _ = require('./utils');
 
-var _global = typeof global !== 'undefined' ? global : typeof window !== 'undefined' ? window : {};
+let _apiWarned = false; // Client instance..
 
-var _WebSocket = _global.WebSocket || require('ws');
-
-var _fetch = _global.fetch || require('node-fetch');
-
-var api = require('./api');
-
-var commands = require('./commands');
-
-var EventEmitter = require('./events').EventEmitter;
-
-var logger = require('./logger');
-
-var parse = require('./parser');
-
-var Queue = require('./timer');
-
-var _ = require('./utils');
-
-var _apiWarned = false; // Client instance..
-
-var client = function client(opts) {
+const client = function client(opts) {
   if (this instanceof client === false) {
     return new client(opts);
   }
@@ -187,7 +152,7 @@ var client = function client(opts) {
   this.wasCloseCalled = false;
   this.ws = null; // Create the logger..
 
-  var level = 'error';
+  let level = 'error';
 
   if (this.opts.options.debug) {
     level = 'info';
@@ -200,9 +165,7 @@ var client = function client(opts) {
   } catch (err) {} // Format the channel names..
 
 
-  this.opts.channels.forEach(function (part, index, theArray) {
-    return theArray[index] = _.channel(part);
-  });
+  this.opts.channels.forEach((part, index, theArray) => theArray[index] = _.channel(part));
   EventEmitter.call(this);
   this.setMaxListeners(0);
 };
@@ -210,33 +173,31 @@ var client = function client(opts) {
 _.inherits(client, EventEmitter); // Put all commands in prototype..
 
 
-for (var methodName in commands) {
+for (const methodName in commands) {
   client.prototype[methodName] = commands[methodName];
 } // Emit multiple events..
 
 
 client.prototype.emits = function emits(types, values) {
-  for (var i = 0; i < types.length; i++) {
-    var val = i < values.length ? values[i] : values[values.length - 1];
+  for (let i = 0; i < types.length; i++) {
+    const val = i < values.length ? values[i] : values[values.length - 1];
     this.emit.apply(this, [types[i]].concat(val));
   }
 };
 /** @deprecated */
 
 
-client.prototype.api = function () {
+client.prototype.api = function (...args) {
   if (!_apiWarned) {
     this.log.warn('Client.prototype.api is deprecated and will be removed for version 2.0.0');
     _apiWarned = true;
   }
 
-  api.apply(void 0, arguments);
+  api(...args);
 }; // Handle parsed chat server message..
 
 
 client.prototype.handleMessage = function handleMessage(message) {
-  var _this = this;
-
   if (!message) {
     return;
   }
@@ -245,21 +206,21 @@ client.prototype.handleMessage = function handleMessage(message) {
     this.emit('raw_message', JSON.parse(JSON.stringify(message)), message);
   }
 
-  var channel = _.channel(_.get(message.params[0], null));
+  const channel = _.channel(_.get(message.params[0], null));
 
-  var msg = _.get(message.params[1], null);
+  let msg = _.get(message.params[1], null);
 
-  var msgid = _.get(message.tags['msg-id'], null); // Parse badges, badge-info and emotes..
+  const msgid = _.get(message.tags['msg-id'], null); // Parse badges, badge-info and emotes..
 
 
-  var tags = message.tags = parse.badges(parse.badgeInfo(parse.emotes(message.tags))); // Transform IRCv3 tags..
+  const tags = message.tags = parse.badges(parse.badgeInfo(parse.emotes(message.tags))); // Transform IRCv3 tags..
 
-  for (var key in tags) {
+  for (const key in tags) {
     if (key === 'emote-sets' || key === 'ban-duration' || key === 'bits') {
       continue;
     }
 
-    var value = tags[key];
+    let value = tags[key];
 
     if (typeof value === 'boolean') {
       value = null;
@@ -290,7 +251,7 @@ client.prototype.handleMessage = function handleMessage(message) {
 
       case 'PONG':
         {
-          var currDate = new Date();
+          const currDate = new Date();
           this.currentLatency = (currDate.getTime() - this.latency.getTime()) / 1000;
           this.emits(['pong', '_promisePing'], [[this.currentLatency]]);
           clearTimeout(this.pingTimeout);
@@ -298,7 +259,7 @@ client.prototype.handleMessage = function handleMessage(message) {
         }
 
       default:
-        this.log.warn("Could not parse message with no prefix:\n".concat(JSON.stringify(message, null, 4)));
+        this.log.warn(`Could not parse message with no prefix:\n${JSON.stringify(message, null, 4)}`);
         break;
     }
   } // Messages with "tmi.twitch.tv" as a prefix..
@@ -326,53 +287,42 @@ client.prototype.handleMessage = function handleMessage(message) {
           this.reconnections = 0;
           this.reconnectTimer = this.reconnectInterval; // Set an internal ping timeout check interval..
 
-          this.pingLoop = setInterval(function () {
+          this.pingLoop = setInterval(() => {
             // Make sure the connection is opened before sending the message..
-            if (_this._isConnected()) {
-              _this.ws.send('PING');
+            if (this._isConnected()) {
+              this.ws.send('PING');
             }
 
-            _this.latency = new Date();
-            _this.pingTimeout = setTimeout(function () {
-              if (_this.ws !== null) {
-                _this.wasCloseCalled = false;
-
-                _this.log.error('Ping timeout.');
-
-                _this.ws.close();
-
-                clearInterval(_this.pingLoop);
-                clearTimeout(_this.pingTimeout);
-                clearTimeout(_this._updateEmotesetsTimer);
+            this.latency = new Date();
+            this.pingTimeout = setTimeout(() => {
+              if (this.ws !== null) {
+                this.wasCloseCalled = false;
+                this.log.error('Ping timeout.');
+                this.ws.close();
+                clearInterval(this.pingLoop);
+                clearTimeout(this.pingTimeout);
+                clearTimeout(this._updateEmotesetsTimer);
               }
-            }, _.get(_this.opts.connection.timeout, 9999));
+            }, _.get(this.opts.connection.timeout, 9999));
           }, 60000); // Join all the channels from the config with an interval..
 
-          var joinInterval = _.get(this.opts.options.joinInterval, 2000);
+          let joinInterval = _.get(this.opts.options.joinInterval, 2000);
 
           if (joinInterval < 300) {
             joinInterval = 300;
           }
 
-          var joinQueue = new Queue(joinInterval);
-
-          var joinChannels = _toConsumableArray(new Set([].concat(_toConsumableArray(this.opts.channels), _toConsumableArray(this.channels))));
-
+          const joinQueue = new Queue(joinInterval);
+          const joinChannels = [...new Set([...this.opts.channels, ...this.channels])];
           this.channels = [];
 
-          var _loop = function _loop(i) {
-            var channel = joinChannels[i];
-            joinQueue.add(function () {
-              if (_this._isConnected()) {
-                _this.join(channel)["catch"](function (err) {
-                  return _this.log.error(err);
-                });
+          for (let i = 0; i < joinChannels.length; i++) {
+            const channel = joinChannels[i];
+            joinQueue.add(() => {
+              if (this._isConnected()) {
+                this.join(channel).catch(err => this.log.error(err));
               }
             });
-          };
-
-          for (var i = 0; i < joinChannels.length; i++) {
-            _loop(i);
           }
 
           joinQueue.next();
@@ -382,37 +332,37 @@ client.prototype.handleMessage = function handleMessage(message) {
 
       case 'NOTICE':
         {
-          var nullArr = [null];
-          var noticeArr = [channel, msgid, msg];
-          var msgidArr = [msgid];
-          var channelTrueArr = [channel, true];
-          var channelFalseArr = [channel, false];
-          var noticeAndNull = [noticeArr, nullArr];
-          var noticeAndMsgid = [noticeArr, msgidArr];
-          var basicLog = "[".concat(channel, "] ").concat(msg);
+          const nullArr = [null];
+          const noticeArr = [channel, msgid, msg];
+          const msgidArr = [msgid];
+          const channelTrueArr = [channel, true];
+          const channelFalseArr = [channel, false];
+          const noticeAndNull = [noticeArr, nullArr];
+          const noticeAndMsgid = [noticeArr, msgidArr];
+          const basicLog = `[${channel}] ${msg}`;
 
           switch (msgid) {
             // This room is now in subscribers-only mode.
             case 'subs_on':
-              this.log.info("[".concat(channel, "] This room is now in subscribers-only mode."));
+              this.log.info(`[${channel}] This room is now in subscribers-only mode.`);
               this.emits(['subscriber', 'subscribers', '_promiseSubscribers'], [channelTrueArr, channelTrueArr, nullArr]);
               break;
             // This room is no longer in subscribers-only mode.
 
             case 'subs_off':
-              this.log.info("[".concat(channel, "] This room is no longer in subscribers-only mode."));
+              this.log.info(`[${channel}] This room is no longer in subscribers-only mode.`);
               this.emits(['subscriber', 'subscribers', '_promiseSubscribersoff'], [channelFalseArr, channelFalseArr, nullArr]);
               break;
             // This room is now in emote-only mode.
 
             case 'emote_only_on':
-              this.log.info("[".concat(channel, "] This room is now in emote-only mode."));
+              this.log.info(`[${channel}] This room is now in emote-only mode.`);
               this.emits(['emoteonly', '_promiseEmoteonly'], [channelTrueArr, nullArr]);
               break;
             // This room is no longer in emote-only mode.
 
             case 'emote_only_off':
-              this.log.info("[".concat(channel, "] This room is no longer in emote-only mode."));
+              this.log.info(`[${channel}] This room is no longer in emote-only mode.`);
               this.emits(['emoteonly', '_promiseEmoteonlyoff'], [channelFalseArr, nullArr]);
               break;
             // Do not handle slow_on/off here, listen to the ROOMSTATE notice instead as it returns the delay.
@@ -429,23 +379,21 @@ client.prototype.handleMessage = function handleMessage(message) {
             // This room is now in r9k mode.
 
             case 'r9k_on':
-              this.log.info("[".concat(channel, "] This room is now in r9k mode."));
+              this.log.info(`[${channel}] This room is now in r9k mode.`);
               this.emits(['r9kmode', 'r9kbeta', '_promiseR9kbeta'], [channelTrueArr, channelTrueArr, nullArr]);
               break;
             // This room is no longer in r9k mode.
 
             case 'r9k_off':
-              this.log.info("[".concat(channel, "] This room is no longer in r9k mode."));
+              this.log.info(`[${channel}] This room is no longer in r9k mode.`);
               this.emits(['r9kmode', 'r9kbeta', '_promiseR9kbetaoff'], [channelFalseArr, channelFalseArr, nullArr]);
               break;
             // The moderators of this room are: [..., ...]
 
             case 'room_mods':
               {
-                var listSplit = msg.split(': ');
-                var mods = (listSplit.length > 1 ? listSplit[1] : '').toLowerCase().split(', ').filter(function (n) {
-                  return n;
-                });
+                const listSplit = msg.split(': ');
+                const mods = (listSplit.length > 1 ? listSplit[1] : '').toLowerCase().split(', ').filter(n => n);
                 this.emits(['_promiseMods', 'mods'], [[null, mods], [channel, mods]]);
                 break;
               }
@@ -462,11 +410,8 @@ client.prototype.handleMessage = function handleMessage(message) {
                   msg = msg.slice(0, -1);
                 }
 
-                var _listSplit = msg.split(': ');
-
-                var vips = (_listSplit.length > 1 ? _listSplit[1] : '').toLowerCase().split(', ').filter(function (n) {
-                  return n;
-                });
+                const listSplit = msg.split(': ');
+                const vips = (listSplit.length > 1 ? listSplit[1] : '').toLowerCase().split(', ').filter(n => n);
                 this.emits(['_promiseVips', 'vips'], [[null, vips], [channel, vips]]);
                 break;
               }
@@ -600,7 +545,7 @@ client.prototype.handleMessage = function handleMessage(message) {
             case 'hosts_remaining':
               {
                 this.log.info(basicLog);
-                var remainingHost = !isNaN(msg[0]) ? parseInt(msg[0]) : 0;
+                const remainingHost = !isNaN(msg[0]) ? parseInt(msg[0]) : 0;
                 this.emits(['notice', '_promiseHost'], [noticeArr, [null, ~~remainingHost]]);
                 break;
               }
@@ -635,7 +580,7 @@ client.prototype.handleMessage = function handleMessage(message) {
               break;
 
             case 'delete_message_success':
-              this.log.info("[".concat(channel, " ").concat(msg, "]"));
+              this.log.info(`[${channel} ${msg}]`);
               this.emits(['notice', '_promiseDeletemessage'], noticeAndNull);
               break;
             // Subscribersoff command failed..
@@ -811,7 +756,7 @@ client.prototype.handleMessage = function handleMessage(message) {
                 this.log.error(this.reason);
                 this.ws.close();
               } else {
-                this.log.warn("Could not parse NOTICE from tmi.twitch.tv:\n".concat(JSON.stringify(message, null, 4)));
+                this.log.warn(`Could not parse NOTICE from tmi.twitch.tv:\n${JSON.stringify(message, null, 4)}`);
                 this.emit('notice', channel, msgid, msg);
               }
 
@@ -824,18 +769,18 @@ client.prototype.handleMessage = function handleMessage(message) {
 
       case 'USERNOTICE':
         {
-          var username = tags['display-name'] || tags['login'];
-          var plan = tags['msg-param-sub-plan'] || '';
-          var planName = _.unescapeIRC(_.get(tags['msg-param-sub-plan-name'], '')) || null;
-          var prime = plan.includes('Prime');
-          var methods = {
-            prime: prime,
-            plan: plan,
-            planName: planName
+          const username = tags['display-name'] || tags['login'];
+          const plan = tags['msg-param-sub-plan'] || '';
+          const planName = _.unescapeIRC(_.get(tags['msg-param-sub-plan-name'], '')) || null;
+          const prime = plan.includes('Prime');
+          const methods = {
+            prime,
+            plan,
+            planName
           };
-          var streakMonths = ~~(tags['msg-param-streak-months'] || 0);
-          var recipient = tags['msg-param-recipient-display-name'] || tags['msg-param-recipient-user-name'];
-          var giftSubCount = ~~tags['msg-param-mass-gift-count'];
+          const streakMonths = ~~(tags['msg-param-streak-months'] || 0);
+          const recipient = tags['msg-param-recipient-display-name'] || tags['msg-param-recipient-user-name'];
+          const giftSubCount = ~~tags['msg-param-mass-gift-count'];
           tags['message-type'] = msgid;
 
           switch (msgid) {
@@ -879,7 +824,7 @@ client.prototype.handleMessage = function handleMessage(message) {
 
             case 'giftpaidupgrade':
               {
-                var sender = tags['msg-param-sender-name'] || tags['msg-param-sender-login'];
+                const sender = tags['msg-param-sender-name'] || tags['msg-param-sender-login'];
                 this.emit('giftpaidupgrade', channel, username, sender, tags);
                 break;
               }
@@ -892,17 +837,16 @@ client.prototype.handleMessage = function handleMessage(message) {
 
             case 'raid':
               {
-                var _username = tags['msg-param-displayName'] || tags['msg-param-login'];
-
-                var viewers = +tags['msg-param-viewerCount'];
-                this.emit('raided', channel, _username, viewers, tags);
+                const username = tags['msg-param-displayName'] || tags['msg-param-login'];
+                const viewers = +tags['msg-param-viewerCount'];
+                this.emit('raided', channel, username, viewers, tags);
                 break;
               }
             // Handle ritual
 
             case 'ritual':
               {
-                var ritualName = tags['msg-param-ritual-name'];
+                const ritualName = tags['msg-param-ritual-name'];
 
                 switch (ritualName) {
                   // Handle new chatter ritual
@@ -932,18 +876,16 @@ client.prototype.handleMessage = function handleMessage(message) {
 
       case 'HOSTTARGET':
         {
-          var msgSplit = msg.split(' ');
-
-          var _viewers = ~~msgSplit[1] || 0; // Stopped hosting..
-
+          const msgSplit = msg.split(' ');
+          const viewers = ~~msgSplit[1] || 0; // Stopped hosting..
 
           if (msgSplit[0] === '-') {
-            this.log.info("[".concat(channel, "] Exited host mode."));
-            this.emits(['unhost', '_promiseUnhost'], [[channel, _viewers], [null]]);
+            this.log.info(`[${channel}] Exited host mode.`);
+            this.emits(['unhost', '_promiseUnhost'], [[channel, viewers], [null]]);
           } // Now hosting..
           else {
-            this.log.info("[".concat(channel, "] Now hosting ").concat(msgSplit[0], " for ").concat(_viewers, " viewer(s)."));
-            this.emit('hosting', channel, msgSplit[0], _viewers);
+            this.log.info(`[${channel}] Now hosting ${msgSplit[0]} for ${viewers} viewer(s).`);
+            this.emit('hosting', channel, msgSplit[0], viewers);
           }
 
           break;
@@ -954,18 +896,18 @@ client.prototype.handleMessage = function handleMessage(message) {
         // User has been banned / timed out by a moderator..
         if (message.params.length > 1) {
           // Duration returns null if it's a ban, otherwise it's a timeout..
-          var duration = _.get(message.tags['ban-duration'], null);
+          const duration = _.get(message.tags['ban-duration'], null);
 
           if (duration === null) {
-            this.log.info("[".concat(channel, "] ").concat(msg, " has been banned."));
+            this.log.info(`[${channel}] ${msg} has been banned.`);
             this.emit('ban', channel, msg, null, message.tags);
           } else {
-            this.log.info("[".concat(channel, "] ").concat(msg, " has been timed out for ").concat(duration, " seconds."));
+            this.log.info(`[${channel}] ${msg} has been timed out for ${duration} seconds.`);
             this.emit('timeout', channel, msg, null, ~~duration, message.tags);
           }
         } // Chat was cleared by a moderator..
         else {
-          this.log.info("[".concat(channel, "] Chat was cleared by a moderator."));
+          this.log.info(`[${channel}] Chat was cleared by a moderator.`);
           this.emits(['clearchat', '_promiseClear'], [[channel], [null]]);
         }
 
@@ -974,11 +916,11 @@ client.prototype.handleMessage = function handleMessage(message) {
 
       case 'CLEARMSG':
         if (message.params.length > 1) {
-          var deletedMessage = msg;
-          var _username2 = tags['login'];
+          const deletedMessage = msg;
+          const username = tags['login'];
           tags['message-type'] = 'messagedeleted';
-          this.log.info("[".concat(channel, "] ").concat(_username2, "'s message has been deleted."));
-          this.emit('messagedeleted', channel, _username2, deletedMessage, tags);
+          this.log.info(`[${channel}] ${username}'s message has been deleted.`);
+          this.emit('messagedeleted', channel, username, deletedMessage, tags);
         }
 
         break;
@@ -986,15 +928,9 @@ client.prototype.handleMessage = function handleMessage(message) {
 
       case 'RECONNECT':
         this.log.info('Received RECONNECT request from Twitch..');
-        this.log.info("Disconnecting and reconnecting in ".concat(Math.round(this.reconnectTimer / 1000), " seconds.."));
-        this.disconnect()["catch"](function (err) {
-          return _this.log.error(err);
-        });
-        setTimeout(function () {
-          return _this.connect()["catch"](function (err) {
-            return _this.log.error(err);
-          });
-        }, this.reconnectTimer);
+        this.log.info(`Disconnecting and reconnecting in ${Math.round(this.reconnectTimer / 1000)} seconds..`);
+        this.disconnect().catch(err => this.log.error(err));
+        setTimeout(() => this.connect().catch(err => this.log.error(err)), this.reconnectTimer);
         break;
       // Received when joining a channel and every time you send a PRIVMSG to a channel.
 
@@ -1016,7 +952,7 @@ client.prototype.handleMessage = function handleMessage(message) {
           this.userstate[channel] = tags;
           this.lastJoined = channel;
           this.channels.push(channel);
-          this.log.info("Joined ".concat(channel));
+          this.log.info(`Joined ${channel}`);
           this.emit('join', channel, _.username(this.getUsername()), true);
         } // Emote-sets has changed, update it..
 
@@ -1056,13 +992,13 @@ client.prototype.handleMessage = function handleMessage(message) {
           // This room is now in slow mode. You may send messages every slow_duration seconds.
           if (_.hasOwn(message.tags, 'slow')) {
             if (typeof message.tags.slow === 'boolean' && !message.tags.slow) {
-              var disabled = [channel, false, 0];
-              this.log.info("[".concat(channel, "] This room is no longer in slow mode."));
+              const disabled = [channel, false, 0];
+              this.log.info(`[${channel}] This room is no longer in slow mode.`);
               this.emits(['slow', 'slowmode', '_promiseSlowoff'], [disabled, disabled, [null]]);
             } else {
-              var seconds = ~~message.tags.slow;
-              var enabled = [channel, true, seconds];
-              this.log.info("[".concat(channel, "] This room is now in slow mode."));
+              const seconds = ~~message.tags.slow;
+              const enabled = [channel, true, seconds];
+              this.log.info(`[${channel}] This room is now in slow mode.`);
               this.emits(['slow', 'slowmode', '_promiseSlow'], [enabled, enabled, [null]]);
             }
           } // Handle followers only mode here instead of the followers_on/off notice..
@@ -1076,14 +1012,14 @@ client.prototype.handleMessage = function handleMessage(message) {
 
           if (_.hasOwn(message.tags, 'followers-only')) {
             if (message.tags['followers-only'] === '-1') {
-              var _disabled = [channel, false, 0];
-              this.log.info("[".concat(channel, "] This room is no longer in followers-only mode."));
-              this.emits(['followersonly', 'followersmode', '_promiseFollowersoff'], [_disabled, _disabled, [null]]);
+              const disabled = [channel, false, 0];
+              this.log.info(`[${channel}] This room is no longer in followers-only mode.`);
+              this.emits(['followersonly', 'followersmode', '_promiseFollowersoff'], [disabled, disabled, [null]]);
             } else {
-              var minutes = ~~message.tags['followers-only'];
-              var _enabled = [channel, true, minutes];
-              this.log.info("[".concat(channel, "] This room is now in follower-only mode."));
-              this.emits(['followersonly', 'followersmode', '_promiseFollowers'], [_enabled, _enabled, [null]]);
+              const minutes = ~~message.tags['followers-only'];
+              const enabled = [channel, true, minutes];
+              this.log.info(`[${channel}] This room is now in follower-only mode.`);
+              this.emits(['followersonly', 'followersmode', '_promiseFollowers'], [enabled, enabled, [null]]);
             }
           }
         }
@@ -1095,7 +1031,7 @@ client.prototype.handleMessage = function handleMessage(message) {
         break;
 
       default:
-        this.log.warn("Could not parse message from tmi.twitch.tv:\n".concat(JSON.stringify(message, null, 4)));
+        this.log.warn(`Could not parse message from tmi.twitch.tv:\n${JSON.stringify(message, null, 4)}`);
         break;
     }
   } // Messages from jtv..
@@ -1119,16 +1055,14 @@ client.prototype.handleMessage = function handleMessage(message) {
             this.moderators[channel] = [];
           }
 
-          this.moderators[channel].filter(function (value) {
-            return value !== message.params[2];
-          });
+          this.moderators[channel].filter(value => value !== message.params[2]);
           this.emit('unmod', channel, message.params[2]);
         }
 
         break;
 
       default:
-        this.log.warn("Could not parse message from jtv:\n".concat(JSON.stringify(message, null, 4)));
+        this.log.warn(`Could not parse message from jtv:\n${JSON.stringify(message, null, 4)}`);
         break;
     }
   } // Anything else..
@@ -1144,12 +1078,12 @@ client.prototype.handleMessage = function handleMessage(message) {
 
       case 'JOIN':
         {
-          var nick = message.prefix.split('!')[0]; // Joined a channel as a justinfan (anonymous) user..
+          const nick = message.prefix.split('!')[0]; // Joined a channel as a justinfan (anonymous) user..
 
           if (_.isJustinfan(this.getUsername()) && this.username === nick) {
             this.lastJoined = channel;
             this.channels.push(channel);
-            this.log.info("Joined ".concat(channel));
+            this.log.info(`Joined ${channel}`);
             this.emit('join', channel, nick, true);
           } // Someone else joined the channel, just emit the join event..
 
@@ -1164,17 +1098,17 @@ client.prototype.handleMessage = function handleMessage(message) {
 
       case 'PART':
         {
-          var isSelf = false;
-          var _nick = message.prefix.split('!')[0]; // Client left a channel..
+          let isSelf = false;
+          const nick = message.prefix.split('!')[0]; // Client left a channel..
 
-          if (this.username === _nick) {
+          if (this.username === nick) {
             isSelf = true;
 
             if (this.userstate[channel]) {
               delete this.userstate[channel];
             }
 
-            var index = this.channels.indexOf(channel);
+            let index = this.channels.indexOf(channel);
 
             if (index !== -1) {
               this.channels.splice(index, 1);
@@ -1186,28 +1120,28 @@ client.prototype.handleMessage = function handleMessage(message) {
               this.opts.channels.splice(index, 1);
             }
 
-            this.log.info("Left ".concat(channel));
+            this.log.info(`Left ${channel}`);
             this.emit('_promisePart', null);
           } // Client or someone else left the channel, emit the part event..
 
 
-          this.emit('part', channel, _nick, isSelf);
+          this.emit('part', channel, nick, isSelf);
           break;
         }
       // Received a whisper..
 
       case 'WHISPER':
         {
-          var _nick2 = message.prefix.split('!')[0];
-          this.log.info("[WHISPER] <".concat(_nick2, ">: ").concat(msg)); // Update the tags to provide the username..
+          const nick = message.prefix.split('!')[0];
+          this.log.info(`[WHISPER] <${nick}>: ${msg}`); // Update the tags to provide the username..
 
           if (!_.hasOwn(message.tags, 'username')) {
-            message.tags.username = _nick2;
+            message.tags.username = nick;
           }
 
           message.tags['message-type'] = 'whisper';
 
-          var from = _.channel(message.tags.username); // Emit for both, whisper and message..
+          const from = _.channel(message.tags.username); // Emit for both, whisper and message..
 
 
           this.emits(['whisper', 'message'], [[from, message.tags, msg, false]]);
@@ -1219,12 +1153,12 @@ client.prototype.handleMessage = function handleMessage(message) {
         message.tags.username = message.prefix.split('!')[0]; // Message from JTV..
 
         if (message.tags.username === 'jtv') {
-          var name = _.username(msg.split(' ')[0]);
+          const name = _.username(msg.split(' ')[0]);
 
-          var autohost = msg.includes('auto'); // Someone is hosting the channel and the message contains how many viewers..
+          const autohost = msg.includes('auto'); // Someone is hosting the channel and the message contains how many viewers..
 
           if (msg.includes('hosting you for')) {
-            var count = _.extractNumber(msg);
+            const count = _.extractNumber(msg);
 
             this.emit('hosted', channel, name, count, autohost);
           } // Some is hosting the channel, but no viewer(s) count provided in the message..
@@ -1232,10 +1166,10 @@ client.prototype.handleMessage = function handleMessage(message) {
             this.emit('hosted', channel, name, 0, autohost);
           }
         } else {
-          var messagesLogLevel = _.get(this.opts.options.messagesLogLevel, 'info'); // Message is an action (/me <message>)..
+          const messagesLogLevel = _.get(this.opts.options.messagesLogLevel, 'info'); // Message is an action (/me <message>)..
 
 
-          var actionMessage = _.actionMessage(msg);
+          const actionMessage = _.actionMessage(msg);
 
           message.tags['message-type'] = actionMessage ? 'action' : 'chat';
           msg = actionMessage ? actionMessage[1] : msg; // Check for Bits prior to actions message
@@ -1246,23 +1180,23 @@ client.prototype.handleMessage = function handleMessage(message) {
             //Handle Channel Point Redemptions (Require's Text Input)
             if (_.hasOwn(message.tags, 'msg-id')) {
               if (message.tags['msg-id'] === 'highlighted-message') {
-                var rewardtype = message.tags['msg-id'];
+                const rewardtype = message.tags['msg-id'];
                 this.emit('redeem', channel, message.tags.username, rewardtype, message.tags, msg);
               } else if (message.tags['msg-id'] === 'skip-subs-mode-message') {
-                var _rewardtype = message.tags['msg-id'];
-                this.emit('redeem', channel, message.tags.username, _rewardtype, message.tags, msg);
+                const rewardtype = message.tags['msg-id'];
+                this.emit('redeem', channel, message.tags.username, rewardtype, message.tags, msg);
               }
             } else if (_.hasOwn(message.tags, 'custom-reward-id')) {
-              var _rewardtype2 = message.tags['custom-reward-id'];
-              this.emit('redeem', channel, message.tags.username, _rewardtype2, message.tags, msg);
+              const rewardtype = message.tags['custom-reward-id'];
+              this.emit('redeem', channel, message.tags.username, rewardtype, message.tags, msg);
             }
 
             if (actionMessage) {
-              this.log[messagesLogLevel]("[".concat(channel, "] *<").concat(message.tags.username, ">: ").concat(msg));
+              this.log[messagesLogLevel](`[${channel}] *<${message.tags.username}>: ${msg}`);
               this.emits(['action', 'message'], [[channel, message.tags, msg, false]]);
             } // Message is a regular chat message..
             else {
-              this.log[messagesLogLevel]("[".concat(channel, "] <").concat(message.tags.username, ">: ").concat(msg));
+              this.log[messagesLogLevel](`[${channel}] <${message.tags.username}>: ${msg}`);
               this.emits(['chat', 'message'], [[channel, message.tags, msg, false]]);
             }
           }
@@ -1271,7 +1205,7 @@ client.prototype.handleMessage = function handleMessage(message) {
         break;
 
       default:
-        this.log.warn("Could not parse message:\n".concat(JSON.stringify(message, null, 4)));
+        this.log.warn(`Could not parse message:\n${JSON.stringify(message, null, 4)}`);
         break;
     }
   }
@@ -1279,32 +1213,30 @@ client.prototype.handleMessage = function handleMessage(message) {
 
 
 client.prototype.connect = function connect() {
-  var _this2 = this;
+  return new Promise((resolve, reject) => {
+    this.server = _.get(this.opts.connection.server, 'irc-ws.chat.twitch.tv');
+    this.port = _.get(this.opts.connection.port, 80); // Override port if using a secure connection..
 
-  return new Promise(function (resolve, reject) {
-    _this2.server = _.get(_this2.opts.connection.server, 'irc-ws.chat.twitch.tv');
-    _this2.port = _.get(_this2.opts.connection.port, 80); // Override port if using a secure connection..
-
-    if (_this2.secure) {
-      _this2.port = 443;
+    if (this.secure) {
+      this.port = 443;
     }
 
-    if (_this2.port === 443) {
-      _this2.secure = true;
+    if (this.port === 443) {
+      this.secure = true;
     }
 
-    _this2.reconnectTimer = _this2.reconnectTimer * _this2.reconnectDecay;
+    this.reconnectTimer = this.reconnectTimer * this.reconnectDecay;
 
-    if (_this2.reconnectTimer >= _this2.maxReconnectInterval) {
-      _this2.reconnectTimer = _this2.maxReconnectInterval;
+    if (this.reconnectTimer >= this.maxReconnectInterval) {
+      this.reconnectTimer = this.maxReconnectInterval;
     } // Connect to server from configuration..
 
 
-    _this2._openConnection();
+    this._openConnection();
 
-    _this2.once('_promiseConnect', function (err) {
+    this.once('_promiseConnect', err => {
       if (!err) {
-        resolve([_this2.server, ~~_this2.port]);
+        resolve([this.server, ~~this.port]);
       } else {
         reject(err);
       }
@@ -1314,10 +1246,10 @@ client.prototype.connect = function connect() {
 
 
 client.prototype._openConnection = function _openConnection() {
-  var url = "".concat(this.secure ? 'wss' : 'ws', "://").concat(this.server, ":").concat(this.port, "/");
+  const url = `${this.secure ? 'wss' : 'ws'}://${this.server}:${this.port}/`;
   /** @type {import('ws').ClientOptions} */
 
-  var connectionOptions = {};
+  const connectionOptions = {};
 
   if ('agent' in this.opts.connection) {
     connectionOptions.agent = this.opts.connection.agent;
@@ -1333,50 +1265,45 @@ client.prototype._openConnection = function _openConnection() {
 
 
 client.prototype._onOpen = function _onOpen() {
-  var _this3 = this;
-
   if (!this._isConnected()) {
     return;
   } // Emitting "connecting" event..
 
 
-  this.log.info("Connecting to ".concat(this.server, " on port ").concat(this.port, ".."));
+  this.log.info(`Connecting to ${this.server} on port ${this.port}..`);
   this.emit('connecting', this.server, ~~this.port);
   this.username = _.get(this.opts.identity.username, _.justinfan());
 
-  this._getToken().then(function (token) {
-    var password = _.password(token); // Emitting "logon" event..
+  this._getToken().then(token => {
+    const password = _.password(token); // Emitting "logon" event..
 
 
-    _this3.log.info('Sending authentication to server..');
+    this.log.info('Sending authentication to server..');
+    this.emit('logon');
+    let caps = 'twitch.tv/tags twitch.tv/commands';
 
-    _this3.emit('logon');
-
-    var caps = 'twitch.tv/tags twitch.tv/commands';
-
-    if (!_this3._skipMembership) {
+    if (!this._skipMembership) {
       caps += ' twitch.tv/membership';
     }
 
-    _this3.ws.send('CAP REQ :' + caps); // Authentication..
-
+    this.ws.send('CAP REQ :' + caps); // Authentication..
 
     if (password) {
-      _this3.ws.send("PASS ".concat(password));
-    } else if (_.isJustinfan(_this3.username)) {
-      _this3.ws.send('PASS SCHMOOPIIE');
+      this.ws.send(`PASS ${password}`);
+    } else if (_.isJustinfan(this.username)) {
+      this.ws.send('PASS SCHMOOPIIE');
     }
 
-    _this3.ws.send("NICK ".concat(_this3.username));
-  })["catch"](function (err) {
-    _this3.emits(['_promiseConnect', 'disconnected'], [[err], ['Could not get a token.']]);
+    this.ws.send(`NICK ${this.username}`);
+  }).catch(err => {
+    this.emits(['_promiseConnect', 'disconnected'], [[err], ['Could not get a token.']]);
   });
 }; // Fetches a token from the option.
 
 
 client.prototype._getToken = function _getToken() {
-  var passwordOption = this.opts.identity.password;
-  var password;
+  const passwordOption = this.opts.identity.password;
+  let password;
 
   if (typeof passwordOption === 'function') {
     password = passwordOption();
@@ -1393,22 +1320,18 @@ client.prototype._getToken = function _getToken() {
 
 
 client.prototype._onMessage = function _onMessage(event) {
-  var _this4 = this;
-
-  var parts = event.data.trim().split('\r\n');
-  parts.forEach(function (str) {
-    var msg = parse.msg(str);
+  const parts = event.data.trim().split('\r\n');
+  parts.forEach(str => {
+    const msg = parse.msg(str);
 
     if (msg) {
-      _this4.handleMessage(msg);
+      this.handleMessage(msg);
     }
   });
 }; // Called when an error occurs..
 
 
 client.prototype._onError = function _onError() {
-  var _this5 = this;
-
   this.moderators = {};
   this.userstate = {};
   this.globaluserstate = {}; // Stop the internal ping timeout check interval..
@@ -1427,14 +1350,11 @@ client.prototype._onError = function _onError() {
   if (this.reconnect && !this.reconnecting && this.reconnections <= this.maxReconnectAttempts - 1) {
     this.reconnecting = true;
     this.reconnections = this.reconnections + 1;
-    this.log.error("Reconnecting in ".concat(Math.round(this.reconnectTimer / 1000), " seconds.."));
+    this.log.error(`Reconnecting in ${Math.round(this.reconnectTimer / 1000)} seconds..`);
     this.emit('reconnect');
-    setTimeout(function () {
-      _this5.reconnecting = false;
-
-      _this5.connect()["catch"](function (err) {
-        return _this5.log.error(err);
-      });
+    setTimeout(() => {
+      this.reconnecting = false;
+      this.connect().catch(err => this.log.error(err));
     }, this.reconnectTimer);
   }
 
@@ -1443,8 +1363,6 @@ client.prototype._onError = function _onError() {
 
 
 client.prototype._onClose = function _onClose() {
-  var _this6 = this;
-
   this.moderators = {};
   this.userstate = {};
   this.globaluserstate = {}; // Stop the internal ping timeout check interval..
@@ -1470,14 +1388,11 @@ client.prototype._onClose = function _onClose() {
     if (this.reconnect && !this.reconnecting && this.reconnections <= this.maxReconnectAttempts - 1) {
       this.reconnecting = true;
       this.reconnections = this.reconnections + 1;
-      this.log.error("Could not connect to server. Reconnecting in ".concat(Math.round(this.reconnectTimer / 1000), " seconds.."));
+      this.log.error(`Could not connect to server. Reconnecting in ${Math.round(this.reconnectTimer / 1000)} seconds..`);
       this.emit('reconnect');
-      setTimeout(function () {
-        _this6.reconnecting = false;
-
-        _this6.connect()["catch"](function (err) {
-          return _this6.log.error(err);
-        });
+      setTimeout(() => {
+        this.reconnecting = false;
+        this.connect().catch(err => this.log.error(err));
       }, this.reconnectTimer);
     }
   }
@@ -1496,36 +1411,30 @@ client.prototype._getPromiseDelay = function _getPromiseDelay() {
 
 
 client.prototype._sendCommand = function _sendCommand(delay, channel, command, fn) {
-  var _this7 = this;
-
   // Race promise against delay..
-  return new Promise(function (resolve, reject) {
+  return new Promise((resolve, reject) => {
     // Make sure the socket is opened..
-    if (!_this7._isConnected()) {
+    if (!this._isConnected()) {
       // Disconnected from server..
       return reject('Not connected to server.');
     } else if (delay === null || typeof delay === 'number') {
       if (delay === null) {
-        delay = _this7._getPromiseDelay();
+        delay = this._getPromiseDelay();
       }
 
-      _.promiseDelay(delay).then(function () {
-        return reject('No response from Twitch.');
-      });
+      _.promiseDelay(delay).then(() => reject('No response from Twitch.'));
     } // Executing a command on a channel..
 
 
     if (channel !== null) {
-      var chan = _.channel(channel);
+      const chan = _.channel(channel);
 
-      _this7.log.info("[".concat(chan, "] Executing command: ").concat(command));
-
-      _this7.ws.send("PRIVMSG ".concat(chan, " :").concat(command));
+      this.log.info(`[${chan}] Executing command: ${command}`);
+      this.ws.send(`PRIVMSG ${chan} :${command}`);
     } // Executing a raw command..
     else {
-      _this7.log.info("Executing command: ".concat(command));
-
-      _this7.ws.send(command);
+      this.log.info(`Executing command: ${command}`);
+      this.ws.send(command);
     }
 
     if (typeof fn === 'function') {
@@ -1538,66 +1447,57 @@ client.prototype._sendCommand = function _sendCommand(delay, channel, command, f
 
 
 client.prototype._sendMessage = function _sendMessage(delay, channel, message, fn) {
-  var _this8 = this;
-
   // Promise a result..
-  return new Promise(function (resolve, reject) {
+  return new Promise((resolve, reject) => {
     // Make sure the socket is opened and not logged in as a justinfan user..
-    if (!_this8._isConnected()) {
+    if (!this._isConnected()) {
       return reject('Not connected to server.');
-    } else if (_.isJustinfan(_this8.getUsername())) {
+    } else if (_.isJustinfan(this.getUsername())) {
       return reject('Cannot send anonymous messages.');
     }
 
-    var chan = _.channel(channel);
+    const chan = _.channel(channel);
 
-    if (!_this8.userstate[chan]) {
-      _this8.userstate[chan] = {};
+    if (!this.userstate[chan]) {
+      this.userstate[chan] = {};
     } // Split long lines otherwise they will be eaten by the server..
 
 
     if (message.length >= 500) {
-      var msg = _.splitLine(message, 500);
+      const msg = _.splitLine(message, 500);
 
       message = msg[0];
-      setTimeout(function () {
-        _this8._sendMessage(delay, channel, msg[1], function () {});
+      setTimeout(() => {
+        this._sendMessage(delay, channel, msg[1], () => {});
       }, 350);
     }
 
-    _this8.ws.send("PRIVMSG ".concat(chan, " :").concat(message));
+    this.ws.send(`PRIVMSG ${chan} :${message}`);
+    const emotes = {}; // Parse regex and string emotes..
 
-    var emotes = {}; // Parse regex and string emotes..
+    Object.keys(this.emotesets).forEach(id => this.emotesets[id].forEach(emote => {
+      const emoteFunc = _.isRegex(emote.code) ? parse.emoteRegex : parse.emoteString;
+      return emoteFunc(message, emote.code, emote.id, emotes);
+    })); // Merge userstate with parsed emotes..
 
-    Object.keys(_this8.emotesets).forEach(function (id) {
-      return _this8.emotesets[id].forEach(function (emote) {
-        var emoteFunc = _.isRegex(emote.code) ? parse.emoteRegex : parse.emoteString;
-        return emoteFunc(message, emote.code, emote.id, emotes);
-      });
-    }); // Merge userstate with parsed emotes..
-
-    var userstate = Object.assign(_this8.userstate[chan], parse.emotes({
+    const userstate = Object.assign(this.userstate[chan], parse.emotes({
       emotes: parse.transformEmotes(emotes) || null
     }));
 
-    var messagesLogLevel = _.get(_this8.opts.options.messagesLogLevel, 'info'); // Message is an action (/me <message>)..
+    const messagesLogLevel = _.get(this.opts.options.messagesLogLevel, 'info'); // Message is an action (/me <message>)..
 
 
-    var actionMessage = _.actionMessage(message);
+    const actionMessage = _.actionMessage(message);
 
     if (actionMessage) {
       userstate['message-type'] = 'action';
-
-      _this8.log[messagesLogLevel]("[".concat(chan, "] *<").concat(_this8.getUsername(), ">: ").concat(actionMessage[1]));
-
-      _this8.emits(['action', 'message'], [[chan, userstate, actionMessage[1], true]]);
+      this.log[messagesLogLevel](`[${chan}] *<${this.getUsername()}>: ${actionMessage[1]}`);
+      this.emits(['action', 'message'], [[chan, userstate, actionMessage[1], true]]);
     } // Message is a regular chat message..
     else {
       userstate['message-type'] = 'chat';
-
-      _this8.log[messagesLogLevel]("[".concat(chan, "] <").concat(_this8.getUsername(), ">: ").concat(message));
-
-      _this8.emits(['chat', 'message'], [[chan, userstate, message, true]]);
+      this.log[messagesLogLevel](`[${chan}] <${this.getUsername()}>: ${message}`);
+      this.emits(['chat', 'message'], [[chan, userstate, message, true]]);
     }
 
     if (typeof fn === 'function') {
@@ -1609,10 +1509,13 @@ client.prototype._sendMessage = function _sendMessage(delay, channel, message, f
 }; // Grab the emote-sets object from the API..
 
 
-client.prototype._updateEmoteset = function _updateEmoteset(sets) {
-  var _this9 = this;
+client.prototype._updateEmoteset = async function updateEmoteset(sets) {
+  if (this.clientId == null) {
+    console.log("couldn't update Emoteset \"this.clientId\" not set");
+    return;
+  }
 
-  var setsChanges = sets !== undefined;
+  let setsChanges = sets !== undefined;
 
   if (setsChanges) {
     if (sets === this.emotes) {
@@ -1630,45 +1533,44 @@ client.prototype._updateEmoteset = function _updateEmoteset(sets) {
     return;
   }
 
-  var setEmotesetTimer = function setEmotesetTimer() {
-    if (_this9._updateEmotesetsTimerDelay > 0) {
-      clearTimeout(_this9._updateEmotesetsTimer);
-      _this9._updateEmotesetsTimer = setTimeout(function () {
-        return _this9._updateEmoteset(sets);
-      }, _this9._updateEmotesetsTimerDelay);
+  const setEmotesetTimer = () => {
+    if (this._updateEmotesetsTimerDelay > 0) {
+      clearTimeout(this._updateEmotesetsTimer);
+      this._updateEmotesetsTimer = setTimeout(() => this._updateEmoteset(sets), this._updateEmotesetsTimerDelay);
     }
   };
 
-  this._getToken().then(function (token) {
-    var url = "https://api.twitch.tv/kraken/chat/emoticon_images?emotesets=".concat(sets);
-    /** @type {import('node-fetch').RequestInit} */
+  this.emotesets = new Object();
+  let setsArray = sets.split(",");
+  let n = Math.ceil(setsArray.length / 25) - 1;
+  let urls = new Array();
+  const token = await this._getToken();
 
-    var fetchOptions = {};
+  for (let c = 0; c <= n; c++) {
+    let t = setsArray.slice(c * 25, (c + 1) * 25);
+    urls.push("https://api.twitch.tv/helix/chat/emotes/set?emote_set_id=".concat(t.join("&emote_set_id=")));
+  }
+  /** @type {import('node-fetch').Response} */
 
-    if ('fetchAgent' in _this9.opts.connection) {
-      fetchOptions.agent = _this9.opts.connection.fetchAgent;
-    }
-    /** @type {import('node-fetch').Response} */
 
-
-    return _fetch(url, _objectSpread(_objectSpread({}, fetchOptions), {}, {
+  const res = await Promise.all(urls.map(async url => {
+    const res = await _fetch(url, {
       headers: {
-        'Accept': 'application/vnd.twitchtv.v5+json',
-        'Authorization': "OAuth ".concat(_.token(token)),
-        'Client-ID': _this9.clientId
+        'Authorization': `Bearer ${_.token(token)}`,
+        'Client-Id': this.clientId
       }
-    }));
-  }).then(function (res) {
-    return res.json();
-  }).then(function (data) {
-    _this9.emotesets = data.emoticon_sets || {};
-
-    _this9.emit('emotesets', sets, _this9.emotesets);
-
-    setEmotesetTimer();
-  })["catch"](function () {
-    return setEmotesetTimer();
+    });
+    return await res.json();
+  }));
+  res.forEach(o => {
+    o.data.forEach(o2 => {
+      this.emotesets[o2.name] = {
+        o2
+      } || {};
+      return;
+    });
   });
+  this.emit('emotesets', sets, this.emotesets);
 }; // Get current username..
 
 
@@ -1688,7 +1590,7 @@ client.prototype.getChannels = function getChannels() {
 
 
 client.prototype.isMod = function isMod(channel, username) {
-  var chan = _.channel(channel);
+  const chan = _.channel(channel);
 
   if (!this.moderators[chan]) {
     this.moderators[chan] = [];
@@ -1713,22 +1615,14 @@ client.prototype._isConnected = function _isConnected() {
 
 
 client.prototype.disconnect = function disconnect() {
-  var _this10 = this;
-
-  return new Promise(function (resolve, reject) {
-    if (_this10.ws !== null && _this10.ws.readyState !== 3) {
-      _this10.wasCloseCalled = true;
-
-      _this10.log.info('Disconnecting from server..');
-
-      _this10.ws.close();
-
-      _this10.once('_promiseDisconnect', function () {
-        return resolve([_this10.server, ~~_this10.port]);
-      });
+  return new Promise((resolve, reject) => {
+    if (this.ws !== null && this.ws.readyState !== 3) {
+      this.wasCloseCalled = true;
+      this.log.info('Disconnecting from server..');
+      this.ws.close();
+      this.once('_promiseDisconnect', () => resolve([this.server, ~~this.port]));
     } else {
-      _this10.log.error('Cannot disconnect from server. Socket is not opened or connection is already closing.');
-
+      this.log.error('Cannot disconnect from server. Socket is not opened or connection is already closing.');
       reject('Cannot disconnect from server. Socket is not opened or connection is already closing.');
     }
   });
@@ -1742,27 +1636,23 @@ if (typeof module !== 'undefined' && module.exports) {
 
 if (typeof window !== 'undefined') {
   window.tmi = {
-    client: client,
+    client,
     Client: client
   };
 }
 
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./api":2,"./commands":4,"./events":5,"./logger":6,"./parser":7,"./timer":8,"./utils":9,"node-fetch":10,"ws":10}],4:[function(require,module,exports){
-"use strict";
-
-var _ = require('./utils'); // Enable followers-only mode on a channel..
+const _ = require('./utils'); // Enable followers-only mode on a channel..
 
 
 function followersonly(channel, minutes) {
-  var _this = this;
-
   channel = _.channel(channel);
   minutes = _.get(minutes, 30); // Send the command to the server and race the Promise against a delay..
 
-  return this._sendCommand(null, channel, "/followers ".concat(minutes), function (resolve, reject) {
+  return this._sendCommand(null, channel, `/followers ${minutes}`, (resolve, reject) => {
     // Received _promiseFollowers event, resolve or reject..
-    _this.once('_promiseFollowers', function (err) {
+    this.once('_promiseFollowers', err => {
       if (!err) {
         resolve([channel, ~~minutes]);
       } else {
@@ -1774,13 +1664,11 @@ function followersonly(channel, minutes) {
 
 
 function followersonlyoff(channel) {
-  var _this2 = this;
-
   channel = _.channel(channel); // Send the command to the server and race the Promise against a delay..
 
-  return this._sendCommand(null, channel, '/followersoff', function (resolve, reject) {
+  return this._sendCommand(null, channel, '/followersoff', (resolve, reject) => {
     // Received _promiseFollowersoff event, resolve or reject..
-    _this2.once('_promiseFollowersoff', function (err) {
+    this.once('_promiseFollowersoff', err => {
       if (!err) {
         resolve([channel]);
       } else {
@@ -1792,13 +1680,11 @@ function followersonlyoff(channel) {
 
 
 function part(channel) {
-  var _this3 = this;
-
   channel = _.channel(channel); // Send the command to the server and race the Promise against a delay..
 
-  return this._sendCommand(null, null, "PART ".concat(channel), function (resolve, reject) {
+  return this._sendCommand(null, null, `PART ${channel}`, (resolve, reject) => {
     // Received _promisePart event, resolve or reject..
-    _this3.once('_promisePart', function (err) {
+    this.once('_promisePart', err => {
       if (!err) {
         resolve([channel]);
       } else {
@@ -1810,13 +1696,11 @@ function part(channel) {
 
 
 function r9kbeta(channel) {
-  var _this4 = this;
-
   channel = _.channel(channel); // Send the command to the server and race the Promise against a delay..
 
-  return this._sendCommand(null, channel, '/r9kbeta', function (resolve, reject) {
+  return this._sendCommand(null, channel, '/r9kbeta', (resolve, reject) => {
     // Received _promiseR9kbeta event, resolve or reject..
-    _this4.once('_promiseR9kbeta', function (err) {
+    this.once('_promiseR9kbeta', err => {
       if (!err) {
         resolve([channel]);
       } else {
@@ -1828,13 +1712,11 @@ function r9kbeta(channel) {
 
 
 function r9kbetaoff(channel) {
-  var _this5 = this;
-
   channel = _.channel(channel); // Send the command to the server and race the Promise against a delay..
 
-  return this._sendCommand(null, channel, '/r9kbetaoff', function (resolve, reject) {
+  return this._sendCommand(null, channel, '/r9kbetaoff', (resolve, reject) => {
     // Received _promiseR9kbetaoff event, resolve or reject..
-    _this5.once('_promiseR9kbetaoff', function (err) {
+    this.once('_promiseR9kbetaoff', err => {
       if (!err) {
         resolve([channel]);
       } else {
@@ -1846,14 +1728,12 @@ function r9kbetaoff(channel) {
 
 
 function slow(channel, seconds) {
-  var _this6 = this;
-
   channel = _.channel(channel);
   seconds = _.get(seconds, 300); // Send the command to the server and race the Promise against a delay..
 
-  return this._sendCommand(null, channel, "/slow ".concat(seconds), function (resolve, reject) {
+  return this._sendCommand(null, channel, `/slow ${seconds}`, (resolve, reject) => {
     // Received _promiseSlow event, resolve or reject..
-    _this6.once('_promiseSlow', function (err) {
+    this.once('_promiseSlow', err => {
       if (!err) {
         resolve([channel, ~~seconds]);
       } else {
@@ -1865,13 +1745,11 @@ function slow(channel, seconds) {
 
 
 function slowoff(channel) {
-  var _this7 = this;
-
   channel = _.channel(channel); // Send the command to the server and race the Promise against a delay..
 
-  return this._sendCommand(null, channel, '/slowoff', function (resolve, reject) {
+  return this._sendCommand(null, channel, '/slowoff', (resolve, reject) => {
     // Received _promiseSlowoff event, resolve or reject..
-    _this7.once('_promiseSlowoff', function (err) {
+    this.once('_promiseSlowoff', err => {
       if (!err) {
         resolve([channel]);
       } else {
@@ -1883,27 +1761,26 @@ function slowoff(channel) {
 
 module.exports = {
   // Send action message (/me <message>) on a channel..
-  action: function action(channel, message) {
+  action(channel, message) {
     channel = _.channel(channel);
-    message = "\x01ACTION ".concat(message, "\x01"); // Send the command to the server and race the Promise against a delay..
+    message = `\u0001ACTION ${message}\u0001`; // Send the command to the server and race the Promise against a delay..
 
-    return this._sendMessage(this._getPromiseDelay(), channel, message, function (resolve, _reject) {
+    return this._sendMessage(this._getPromiseDelay(), channel, message, (resolve, _reject) => {
       // At this time, there is no possible way to detect if a message has been sent has been eaten
       // by the server, so we can only resolve the Promise.
       resolve([channel, message]);
     });
   },
-  // Ban username on channel..
-  ban: function ban(channel, username, reason) {
-    var _this8 = this;
 
+  // Ban username on channel..
+  ban(channel, username, reason) {
     channel = _.channel(channel);
     username = _.username(username);
     reason = _.get(reason, ''); // Send the command to the server and race the Promise against a delay..
 
-    return this._sendCommand(null, channel, "/ban ".concat(username, " ").concat(reason), function (resolve, reject) {
+    return this._sendCommand(null, channel, `/ban ${username} ${reason}`, (resolve, reject) => {
       // Received _promiseBan event, resolve or reject..
-      _this8.once('_promiseBan', function (err) {
+      this.once('_promiseBan', err => {
         if (!err) {
           resolve([channel, username, reason]);
         } else {
@@ -1912,15 +1789,14 @@ module.exports = {
       });
     });
   },
-  // Clear all messages on a channel..
-  clear: function clear(channel) {
-    var _this9 = this;
 
+  // Clear all messages on a channel..
+  clear(channel) {
     channel = _.channel(channel); // Send the command to the server and race the Promise against a delay..
 
-    return this._sendCommand(null, channel, '/clear', function (resolve, reject) {
+    return this._sendCommand(null, channel, '/clear', (resolve, reject) => {
       // Received _promiseClear event, resolve or reject..
-      _this9.once('_promiseClear', function (err) {
+      this.once('_promiseClear', err => {
         if (!err) {
           resolve([channel]);
         } else {
@@ -1929,15 +1805,14 @@ module.exports = {
       });
     });
   },
-  // Change the color of your username..
-  color: function color(channel, newColor) {
-    var _this10 = this;
 
+  // Change the color of your username..
+  color(channel, newColor) {
     newColor = _.get(newColor, channel); // Send the command to the server and race the Promise against a delay..
 
-    return this._sendCommand(null, '#tmijs', "/color ".concat(newColor), function (resolve, reject) {
+    return this._sendCommand(null, '#tmijs', `/color ${newColor}`, (resolve, reject) => {
       // Received _promiseColor event, resolve or reject..
-      _this10.once('_promiseColor', function (err) {
+      this.once('_promiseColor', err => {
         if (!err) {
           resolve([newColor]);
         } else {
@@ -1946,16 +1821,15 @@ module.exports = {
       });
     });
   },
-  // Run commercial on a channel for X seconds..
-  commercial: function commercial(channel, seconds) {
-    var _this11 = this;
 
+  // Run commercial on a channel for X seconds..
+  commercial(channel, seconds) {
     channel = _.channel(channel);
     seconds = _.get(seconds, 30); // Send the command to the server and race the Promise against a delay..
 
-    return this._sendCommand(null, channel, "/commercial ".concat(seconds), function (resolve, reject) {
+    return this._sendCommand(null, channel, `/commercial ${seconds}`, (resolve, reject) => {
       // Received _promiseCommercial event, resolve or reject..
-      _this11.once('_promiseCommercial', function (err) {
+      this.once('_promiseCommercial', err => {
         if (!err) {
           resolve([channel, ~~seconds]);
         } else {
@@ -1964,15 +1838,14 @@ module.exports = {
       });
     });
   },
+
   // Delete a specific message on a channel
-  deletemessage: function deletemessage(channel, messageUUID) {
-    var _this12 = this;
-
+  deletemessage(channel, messageUUID) {
     channel = _.channel(channel); // Send the command to the server and race the Promise against a delay..
 
-    return this._sendCommand(null, channel, "/delete ".concat(messageUUID), function (resolve, reject) {
+    return this._sendCommand(null, channel, `/delete ${messageUUID}`, (resolve, reject) => {
       // Received _promiseDeletemessage event, resolve or reject..
-      _this12.once('_promiseDeletemessage', function (err) {
+      this.once('_promiseDeletemessage', err => {
         if (!err) {
           resolve([channel]);
         } else {
@@ -1981,15 +1854,14 @@ module.exports = {
       });
     });
   },
+
   // Enable emote-only mode on a channel..
-  emoteonly: function emoteonly(channel) {
-    var _this13 = this;
-
+  emoteonly(channel) {
     channel = _.channel(channel); // Send the command to the server and race the Promise against a delay..
 
-    return this._sendCommand(null, channel, '/emoteonly', function (resolve, reject) {
+    return this._sendCommand(null, channel, '/emoteonly', (resolve, reject) => {
       // Received _promiseEmoteonly event, resolve or reject..
-      _this13.once('_promiseEmoteonly', function (err) {
+      this.once('_promiseEmoteonly', err => {
         if (!err) {
           resolve([channel]);
         } else {
@@ -1998,15 +1870,14 @@ module.exports = {
       });
     });
   },
-  // Disable emote-only mode on a channel..
-  emoteonlyoff: function emoteonlyoff(channel) {
-    var _this14 = this;
 
+  // Disable emote-only mode on a channel..
+  emoteonlyoff(channel) {
     channel = _.channel(channel); // Send the command to the server and race the Promise against a delay..
 
-    return this._sendCommand(null, channel, '/emoteonlyoff', function (resolve, reject) {
+    return this._sendCommand(null, channel, '/emoteonlyoff', (resolve, reject) => {
       // Received _promiseEmoteonlyoff event, resolve or reject..
-      _this14.once('_promiseEmoteonlyoff', function (err) {
+      this.once('_promiseEmoteonlyoff', err => {
         if (!err) {
           resolve([channel]);
         } else {
@@ -2015,24 +1886,24 @@ module.exports = {
       });
     });
   },
+
   // Enable followers-only mode on a channel..
-  followersonly: followersonly,
+  followersonly,
   // Alias for followersonly()..
   followersmode: followersonly,
   // Disable followers-only mode on a channel..
-  followersonlyoff: followersonlyoff,
+  followersonlyoff,
   // Alias for followersonlyoff()..
   followersmodeoff: followersonlyoff,
-  // Host a channel..
-  host: function host(channel, target) {
-    var _this15 = this;
 
+  // Host a channel..
+  host(channel, target) {
     channel = _.channel(channel);
     target = _.username(target); // Send the command to the server and race the Promise against a delay..
 
-    return this._sendCommand(2000, channel, "/host ".concat(target), function (resolve, reject) {
+    return this._sendCommand(2000, channel, `/host ${target}`, (resolve, reject) => {
       // Received _promiseHost event, resolve or reject..
-      _this15.once('_promiseHost', function (err, remaining) {
+      this.once('_promiseHost', (err, remaining) => {
         if (!err) {
           resolve([channel, target, ~~remaining]);
         } else {
@@ -2041,21 +1912,19 @@ module.exports = {
       });
     });
   },
-  // Join a channel..
-  join: function join(channel) {
-    var _this16 = this;
 
+  // Join a channel..
+  join(channel) {
     channel = _.channel(channel); // Send the command to the server ..
 
-    return this._sendCommand(undefined, null, "JOIN ".concat(channel), function (resolve, reject) {
-      var eventName = '_promiseJoin';
-      var hasFulfilled = false;
+    return this._sendCommand(undefined, null, `JOIN ${channel}`, (resolve, reject) => {
+      const eventName = '_promiseJoin';
+      let hasFulfilled = false;
 
-      var listener = function listener(err, joinedChannel) {
+      const listener = (err, joinedChannel) => {
         if (channel === _.channel(joinedChannel)) {
           // Received _promiseJoin event for the target channel, resolve or reject..
-          _this16.removeListener(eventName, listener);
-
+          this.removeListener(eventName, listener);
           hasFulfilled = true;
 
           if (!err) {
@@ -2066,28 +1935,26 @@ module.exports = {
         }
       };
 
-      _this16.on(eventName, listener); // Race the Promise against a delay..
+      this.on(eventName, listener); // Race the Promise against a delay..
 
+      const delay = this._getPromiseDelay();
 
-      var delay = _this16._getPromiseDelay();
-
-      _.promiseDelay(delay).then(function () {
+      _.promiseDelay(delay).then(() => {
         if (!hasFulfilled) {
-          _this16.emit(eventName, 'No response from Twitch.', channel);
+          this.emit(eventName, 'No response from Twitch.', channel);
         }
       });
     });
   },
-  // Mod username on channel..
-  mod: function mod(channel, username) {
-    var _this17 = this;
 
+  // Mod username on channel..
+  mod(channel, username) {
     channel = _.channel(channel);
     username = _.username(username); // Send the command to the server and race the Promise against a delay..
 
-    return this._sendCommand(null, channel, "/mod ".concat(username), function (resolve, reject) {
+    return this._sendCommand(null, channel, `/mod ${username}`, (resolve, reject) => {
       // Received _promiseMod event, resolve or reject..
-      _this17.once('_promiseMod', function (err) {
+      this.once('_promiseMod', err => {
         if (!err) {
           resolve([channel, username]);
         } else {
@@ -2096,24 +1963,23 @@ module.exports = {
       });
     });
   },
-  // Get list of mods on a channel..
-  mods: function mods(channel) {
-    var _this18 = this;
 
+  // Get list of mods on a channel..
+  mods(channel) {
     channel = _.channel(channel); // Send the command to the server and race the Promise against a delay..
 
-    return this._sendCommand(null, channel, '/mods', function (resolve, reject) {
+    return this._sendCommand(null, channel, '/mods', (resolve, reject) => {
       // Received _promiseMods event, resolve or reject..
-      _this18.once('_promiseMods', function (err, mods) {
+      this.once('_promiseMods', (err, mods) => {
         if (!err) {
           // Update the internal list of moderators..
-          mods.forEach(function (username) {
-            if (!_this18.moderators[channel]) {
-              _this18.moderators[channel] = [];
+          mods.forEach(username => {
+            if (!this.moderators[channel]) {
+              this.moderators[channel] = [];
             }
 
-            if (!_this18.moderators[channel].includes(username)) {
-              _this18.moderators[channel].push(username);
+            if (!this.moderators[channel].includes(username)) {
+              this.moderators[channel].push(username);
             }
           });
           resolve(mods);
@@ -2123,53 +1989,51 @@ module.exports = {
       });
     });
   },
+
   // Leave a channel..
-  part: part,
+  part,
   // Alias for part()..
   leave: part,
+
   // Send a ping to the server..
-  ping: function ping() {
-    var _this19 = this;
-
+  ping() {
     // Send the command to the server and race the Promise against a delay..
-    return this._sendCommand(null, null, 'PING', function (resolve, _reject) {
+    return this._sendCommand(null, null, 'PING', (resolve, _reject) => {
       // Update the internal ping timeout check interval..
-      _this19.latency = new Date();
-      _this19.pingTimeout = setTimeout(function () {
-        if (_this19.ws !== null) {
-          _this19.wasCloseCalled = false;
-
-          _this19.log.error('Ping timeout.');
-
-          _this19.ws.close();
-
-          clearInterval(_this19.pingLoop);
-          clearTimeout(_this19.pingTimeout);
+      this.latency = new Date();
+      this.pingTimeout = setTimeout(() => {
+        if (this.ws !== null) {
+          this.wasCloseCalled = false;
+          this.log.error('Ping timeout.');
+          this.ws.close();
+          clearInterval(this.pingLoop);
+          clearTimeout(this.pingTimeout);
         }
-      }, _.get(_this19.opts.connection.timeout, 9999)); // Received _promisePing event, resolve or reject..
+      }, _.get(this.opts.connection.timeout, 9999)); // Received _promisePing event, resolve or reject..
 
-      _this19.once('_promisePing', function (latency) {
-        return resolve([parseFloat(latency)]);
-      });
+      this.once('_promisePing', latency => resolve([parseFloat(latency)]));
     });
   },
+
   // Enable R9KBeta mode on a channel..
-  r9kbeta: r9kbeta,
+  r9kbeta,
   // Alias for r9kbeta()..
   r9kmode: r9kbeta,
   // Disable R9KBeta mode on a channel..
-  r9kbetaoff: r9kbetaoff,
+  r9kbetaoff,
   // Alias for r9kbetaoff()..
   r9kmodeoff: r9kbetaoff,
+
   // Send a raw message to the server..
-  raw: function raw(message) {
+  raw(message) {
     // Send the command to the server and race the Promise against a delay..
-    return this._sendCommand(null, null, message, function (resolve, _reject) {
+    return this._sendCommand(null, null, message, (resolve, _reject) => {
       resolve([message]);
     });
   },
+
   // Send a message on a channel..
-  say: function say(channel, message) {
+  say(channel, message) {
     channel = _.channel(channel);
 
     if (message.startsWith('.') && !message.startsWith('..') || message.startsWith('/') || message.startsWith('\\')) {
@@ -2178,7 +2042,7 @@ module.exports = {
         return this.action(channel, message.substr(4));
       } else {
         // Send the command to the server and race the Promise against a delay..
-        return this._sendCommand(null, channel, message, function (resolve, _reject) {
+        return this._sendCommand(null, channel, message, (resolve, _reject) => {
           // At this time, there is no possible way to detect if a message has been sent has been eaten
           // by the server, so we can only resolve the Promise.
           resolve([channel, message]);
@@ -2187,29 +2051,29 @@ module.exports = {
     } // Send the command to the server and race the Promise against a delay..
 
 
-    return this._sendMessage(this._getPromiseDelay(), channel, message, function (resolve, _reject) {
+    return this._sendMessage(this._getPromiseDelay(), channel, message, (resolve, _reject) => {
       // At this time, there is no possible way to detect if a message has been sent has been eaten
       // by the server, so we can only resolve the Promise.
       resolve([channel, message]);
     });
   },
+
   // Enable slow mode on a channel..
-  slow: slow,
+  slow,
   // Alias for slow()..
   slowmode: slow,
   // Disable slow mode on a channel..
-  slowoff: slowoff,
+  slowoff,
   // Alias for slowoff()..
   slowmodeoff: slowoff,
+
   // Enable subscribers mode on a channel..
-  subscribers: function subscribers(channel) {
-    var _this20 = this;
-
+  subscribers(channel) {
     channel = _.channel(channel); // Send the command to the server and race the Promise against a delay..
 
-    return this._sendCommand(null, channel, '/subscribers', function (resolve, reject) {
+    return this._sendCommand(null, channel, '/subscribers', (resolve, reject) => {
       // Received _promiseSubscribers event, resolve or reject..
-      _this20.once('_promiseSubscribers', function (err) {
+      this.once('_promiseSubscribers', err => {
         if (!err) {
           resolve([channel]);
         } else {
@@ -2218,15 +2082,14 @@ module.exports = {
       });
     });
   },
-  // Disable subscribers mode on a channel..
-  subscribersoff: function subscribersoff(channel) {
-    var _this21 = this;
 
+  // Disable subscribers mode on a channel..
+  subscribersoff(channel) {
     channel = _.channel(channel); // Send the command to the server and race the Promise against a delay..
 
-    return this._sendCommand(null, channel, '/subscribersoff', function (resolve, reject) {
+    return this._sendCommand(null, channel, '/subscribersoff', (resolve, reject) => {
       // Received _promiseSubscribersoff event, resolve or reject..
-      _this21.once('_promiseSubscribersoff', function (err) {
+      this.once('_promiseSubscribersoff', err => {
         if (!err) {
           resolve([channel]);
         } else {
@@ -2235,10 +2098,9 @@ module.exports = {
       });
     });
   },
-  // Timeout username on channel for X seconds..
-  timeout: function timeout(channel, username, seconds, reason) {
-    var _this22 = this;
 
+  // Timeout username on channel for X seconds..
+  timeout(channel, username, seconds, reason) {
     channel = _.channel(channel);
     username = _.username(username);
 
@@ -2250,9 +2112,9 @@ module.exports = {
     seconds = _.get(seconds, 300);
     reason = _.get(reason, ''); // Send the command to the server and race the Promise against a delay..
 
-    return this._sendCommand(null, channel, "/timeout ".concat(username, " ").concat(seconds, " ").concat(reason), function (resolve, reject) {
+    return this._sendCommand(null, channel, `/timeout ${username} ${seconds} ${reason}`, (resolve, reject) => {
       // Received _promiseTimeout event, resolve or reject..
-      _this22.once('_promiseTimeout', function (err) {
+      this.once('_promiseTimeout', err => {
         if (!err) {
           resolve([channel, username, ~~seconds, reason]);
         } else {
@@ -2261,16 +2123,15 @@ module.exports = {
       });
     });
   },
-  // Unban username on channel..
-  unban: function unban(channel, username) {
-    var _this23 = this;
 
+  // Unban username on channel..
+  unban(channel, username) {
     channel = _.channel(channel);
     username = _.username(username); // Send the command to the server and race the Promise against a delay..
 
-    return this._sendCommand(null, channel, "/unban ".concat(username), function (resolve, reject) {
+    return this._sendCommand(null, channel, `/unban ${username}`, (resolve, reject) => {
       // Received _promiseUnban event, resolve or reject..
-      _this23.once('_promiseUnban', function (err) {
+      this.once('_promiseUnban', err => {
         if (!err) {
           resolve([channel, username]);
         } else {
@@ -2279,15 +2140,14 @@ module.exports = {
       });
     });
   },
-  // End the current hosting..
-  unhost: function unhost(channel) {
-    var _this24 = this;
 
+  // End the current hosting..
+  unhost(channel) {
     channel = _.channel(channel); // Send the command to the server and race the Promise against a delay..
 
-    return this._sendCommand(2000, channel, '/unhost', function (resolve, reject) {
+    return this._sendCommand(2000, channel, '/unhost', (resolve, reject) => {
       // Received _promiseUnhost event, resolve or reject..
-      _this24.once('_promiseUnhost', function (err) {
+      this.once('_promiseUnhost', err => {
         if (!err) {
           resolve([channel]);
         } else {
@@ -2296,16 +2156,15 @@ module.exports = {
       });
     });
   },
+
   // Unmod username on channel..
-  unmod: function unmod(channel, username) {
-    var _this25 = this;
-
+  unmod(channel, username) {
     channel = _.channel(channel);
     username = _.username(username); // Send the command to the server and race the Promise against a delay..
 
-    return this._sendCommand(null, channel, "/unmod ".concat(username), function (resolve, reject) {
+    return this._sendCommand(null, channel, `/unmod ${username}`, (resolve, reject) => {
       // Received _promiseUnmod event, resolve or reject..
-      _this25.once('_promiseUnmod', function (err) {
+      this.once('_promiseUnmod', err => {
         if (!err) {
           resolve([channel, username]);
         } else {
@@ -2314,16 +2173,15 @@ module.exports = {
       });
     });
   },
+
   // Unvip username on channel..
-  unvip: function unvip(channel, username) {
-    var _this26 = this;
-
+  unvip(channel, username) {
     channel = _.channel(channel);
     username = _.username(username); // Send the command to the server and race the Promise against a delay..
 
-    return this._sendCommand(null, channel, "/unvip ".concat(username), function (resolve, reject) {
+    return this._sendCommand(null, channel, `/unvip ${username}`, (resolve, reject) => {
       // Received _promiseUnvip event, resolve or reject..
-      _this26.once('_promiseUnvip', function (err) {
+      this.once('_promiseUnvip', err => {
         if (!err) {
           resolve([channel, username]);
         } else {
@@ -2332,16 +2190,15 @@ module.exports = {
       });
     });
   },
-  // Add username to VIP list on channel..
-  vip: function vip(channel, username) {
-    var _this27 = this;
 
+  // Add username to VIP list on channel..
+  vip(channel, username) {
     channel = _.channel(channel);
     username = _.username(username); // Send the command to the server and race the Promise against a delay..
 
-    return this._sendCommand(null, channel, "/vip ".concat(username), function (resolve, reject) {
+    return this._sendCommand(null, channel, `/vip ${username}`, (resolve, reject) => {
       // Received _promiseVip event, resolve or reject..
-      _this27.once('_promiseVip', function (err) {
+      this.once('_promiseVip', err => {
         if (!err) {
           resolve([channel, username]);
         } else {
@@ -2350,15 +2207,14 @@ module.exports = {
       });
     });
   },
-  // Get list of VIPs on a channel..
-  vips: function vips(channel) {
-    var _this28 = this;
 
+  // Get list of VIPs on a channel..
+  vips(channel) {
     channel = _.channel(channel); // Send the command to the server and race the Promise against a delay..
 
-    return this._sendCommand(null, channel, '/vips', function (resolve, reject) {
+    return this._sendCommand(null, channel, '/vips', (resolve, reject) => {
       // Received _promiseVips event, resolve or reject..
-      _this28.once('_promiseVips', function (err, vips) {
+      this.once('_promiseVips', (err, vips) => {
         if (!err) {
           resolve(vips);
         } else {
@@ -2367,10 +2223,9 @@ module.exports = {
       });
     });
   },
-  // Send an whisper message to a user..
-  whisper: function whisper(username, message) {
-    var _this29 = this;
 
+  // Send an whisper message to a user..
+  whisper(username, message) {
     username = _.username(username); // The server will not send a whisper to the account that sent it.
 
     if (username === this.getUsername()) {
@@ -2378,13 +2233,13 @@ module.exports = {
     } // Send the command to the server and race the Promise against a delay..
 
 
-    return this._sendCommand(null, '#tmijs', "/w ".concat(username, " ").concat(message), function (_resolve, reject) {
-      _this29.once('_promiseWhisper', function (err) {
+    return this._sendCommand(null, '#tmijs', `/w ${username} ${message}`, (_resolve, reject) => {
+      this.once('_promiseWhisper', err => {
         if (err) {
           reject(err);
         }
       });
-    })["catch"](function (err) {
+    }).catch(err => {
       // Either an "actual" error occured or the timeout triggered
       // the latter means no errors have occured and we can resolve
       // else just elevate the error
@@ -2392,27 +2247,23 @@ module.exports = {
         throw err;
       }
 
-      var from = _.channel(username);
+      const from = _.channel(username);
 
-      var userstate = Object.assign({
+      const userstate = Object.assign({
         'message-type': 'whisper',
         'message-id': null,
         'thread-id': null,
-        username: _this29.getUsername()
-      }, _this29.globaluserstate); // Emit for both, whisper and message..
+        username: this.getUsername()
+      }, this.globaluserstate); // Emit for both, whisper and message..
 
-      _this29.emits(['whisper', 'message'], [[from, userstate, message, true], [from, userstate, message, true]]);
-
+      this.emits(['whisper', 'message'], [[from, userstate, message, true], [from, userstate, message, true]]);
       return [username, message];
     });
   }
+
 };
 
 },{"./utils":9}],5:[function(require,module,exports){
-"use strict";
-
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
 /* istanbul ignore file */
 
 /* eslint-disable */
@@ -2765,7 +2616,7 @@ function isNumber(arg) {
 }
 
 function isObject(arg) {
-  return _typeof(arg) === "object" && arg !== null;
+  return typeof arg === "object" && arg !== null;
 }
 
 function isUndefined(arg) {
@@ -2773,12 +2624,10 @@ function isUndefined(arg) {
 }
 
 },{}],6:[function(require,module,exports){
-"use strict";
+const _ = require('./utils');
 
-var _ = require('./utils');
-
-var currentLevel = 'info';
-var levels = {
+let currentLevel = 'info';
+const levels = {
   'trace': 0,
   'debug': 1,
   'info': 2,
@@ -2791,16 +2640,17 @@ function log(level) {
   // Return a console message depending on the logging level..
   return function (message) {
     if (levels[level] >= levels[currentLevel]) {
-      console.log("[".concat(_.formatDate(new Date()), "] ").concat(level, ": ").concat(message));
+      console.log(`[${_.formatDate(new Date())}] ${level}: ${message}`);
     }
   };
 }
 
 module.exports = {
   // Change the current logging level..
-  setLevel: function setLevel(level) {
+  setLevel(level) {
     currentLevel = level;
   },
+
   trace: log('trace'),
   debug: log('debug'),
   info: log('info'),
@@ -2810,8 +2660,6 @@ module.exports = {
 };
 
 },{"./utils":9}],7:[function(require,module,exports){
-"use strict";
-
 /*
 	Copyright (c) 2013-2015, Fionn Kelleher All rights reserved.
 
@@ -2836,21 +2684,18 @@ module.exports = {
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 	OF SUCH DAMAGE.
 */
-var _ = require('./utils');
+const _ = require('./utils');
 
-var nonspaceRegex = /\S+/g;
+const nonspaceRegex = /\S+/g;
 
-function parseComplexTag(tags, tagKey) {
-  var splA = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : ',';
-  var splB = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : '/';
-  var splC = arguments.length > 4 ? arguments[4] : undefined;
-  var raw = tags[tagKey];
+function parseComplexTag(tags, tagKey, splA = ',', splB = '/', splC) {
+  const raw = tags[tagKey];
 
   if (raw === undefined) {
     return tags;
   }
 
-  var tagIsString = typeof raw === 'string';
+  const tagIsString = typeof raw === 'string';
   tags[tagKey + '-raw'] = tagIsString ? raw : null;
 
   if (raw === true) {
@@ -2861,11 +2706,11 @@ function parseComplexTag(tags, tagKey) {
   tags[tagKey] = {};
 
   if (tagIsString) {
-    var spl = raw.split(splA);
+    const spl = raw.split(splA);
 
-    for (var i = 0; i < spl.length; i++) {
-      var parts = spl[i].split(splB);
-      var val = parts[1];
+    for (let i = 0; i < spl.length; i++) {
+      const parts = spl[i].split(splB);
+      let val = parts[1];
 
       if (splC !== undefined && val) {
         val = val.split(splC);
@@ -2880,22 +2725,17 @@ function parseComplexTag(tags, tagKey) {
 
 module.exports = {
   // Parse Twitch badges..
-  badges: function badges(tags) {
-    return parseComplexTag(tags, 'badges');
-  },
+  badges: tags => parseComplexTag(tags, 'badges'),
   // Parse Twitch badge-info..
-  badgeInfo: function badgeInfo(tags) {
-    return parseComplexTag(tags, 'badge-info');
-  },
+  badgeInfo: tags => parseComplexTag(tags, 'badge-info'),
   // Parse Twitch emotes..
-  emotes: function emotes(tags) {
-    return parseComplexTag(tags, 'emotes', '/', ':', ',');
-  },
+  emotes: tags => parseComplexTag(tags, 'emotes', '/', ':', ','),
+
   // Parse regex emotes..
-  emoteRegex: function emoteRegex(msg, code, id, obj) {
+  emoteRegex(msg, code, id, obj) {
     nonspaceRegex.lastIndex = 0;
-    var regex = new RegExp('(\\b|^|\\s)' + _.unescapeHtml(code) + '(\\b|$|\\s)');
-    var match; // Check if emote code matches using RegExp and push it to the object..
+    const regex = new RegExp('(\\b|^|\\s)' + _.unescapeHtml(code) + '(\\b|$|\\s)');
+    let match; // Check if emote code matches using RegExp and push it to the object..
 
     while ((match = nonspaceRegex.exec(msg)) !== null) {
       if (regex.test(match[0])) {
@@ -2904,10 +2744,11 @@ module.exports = {
       }
     }
   },
+
   // Parse string emotes..
-  emoteString: function emoteString(msg, code, id, obj) {
+  emoteString(msg, code, id, obj) {
     nonspaceRegex.lastIndex = 0;
-    var match; // Check if emote code matches and push it to the object..
+    let match; // Check if emote code matches and push it to the object..
 
     while ((match = nonspaceRegex.exec(msg)) !== null) {
       if (match[0] === _.unescapeHtml(code)) {
@@ -2916,33 +2757,34 @@ module.exports = {
       }
     }
   },
+
   // Transform the emotes object to a string with the following format..
   // emote_id:first_index-last_index,another_first-another_last/another_emote_id:first_index-last_index
-  transformEmotes: function transformEmotes(emotes) {
-    var transformed = '';
-    Object.keys(emotes).forEach(function (id) {
-      transformed = "".concat(transformed + id, ":");
-      emotes[id].forEach(function (index) {
-        return transformed = "".concat(transformed + index.join('-'), ",");
-      });
-      transformed = "".concat(transformed.slice(0, -1), "/");
+  transformEmotes(emotes) {
+    let transformed = '';
+    Object.keys(emotes).forEach(id => {
+      transformed = `${transformed + id}:`;
+      emotes[id].forEach(index => transformed = `${transformed + index.join('-')},`);
+      transformed = `${transformed.slice(0, -1)}/`;
     });
     return transformed.slice(0, -1);
   },
-  formTags: function formTags(tags) {
-    var result = [];
 
-    for (var key in tags) {
-      var value = _.escapeIRC(tags[key]);
+  formTags(tags) {
+    const result = [];
 
-      result.push("".concat(key, "=").concat(value));
+    for (const key in tags) {
+      const value = _.escapeIRC(tags[key]);
+
+      result.push(`${key}=${value}`);
     }
 
-    return "@".concat(result.join(';'));
+    return `@${result.join(';')}`;
   },
+
   // Parse Twitch messages..
-  msg: function msg(data) {
-    var message = {
+  msg(data) {
+    const message = {
       raw: data,
       tags: {},
       prefix: null,
@@ -2950,8 +2792,8 @@ module.exports = {
       params: []
     }; // Position and nextspace are used by the parser as a reference..
 
-    var position = 0;
-    var nextspace = 0; // The first thing we check for is IRCv3.2 message tags.
+    let position = 0;
+    let nextspace = 0; // The first thing we check for is IRCv3.2 message tags.
     // http://ircv3.atheme.org/specification/message-tags-3.2
 
     if (data.charCodeAt(0) === 64) {
@@ -2962,13 +2804,13 @@ module.exports = {
       } // Tags are split by a semi colon..
 
 
-      var rawTags = data.slice(1, nextspace).split(';');
+      const rawTags = data.slice(1, nextspace).split(';');
 
-      for (var i = 0; i < rawTags.length; i++) {
+      for (let i = 0; i < rawTags.length; i++) {
         // Tags delimited by an equals sign are key=value tags.
         // If there's no equals, we assign the tag a value of true.
-        var tag = rawTags[i];
-        var pair = tag.split('=');
+        const tag = rawTags[i];
+        const pair = tag.split('=');
         message.tags[pair[0]] = tag.substring(tag.indexOf('=') + 1) || true;
       }
 
@@ -3052,215 +2894,164 @@ module.exports = {
 
     return message;
   }
+
 };
 
 },{"./utils":9}],8:[function(require,module,exports){
-"use strict";
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
 // Initialize the queue with a specific delay..
-var Queue = /*#__PURE__*/function () {
-  function Queue(defaultDelay) {
-    _classCallCheck(this, Queue);
-
+class Queue {
+  constructor(defaultDelay) {
     this.queue = [];
     this.index = 0;
     this.defaultDelay = defaultDelay === undefined ? 3000 : defaultDelay;
   } // Add a new function to the queue..
 
 
-  _createClass(Queue, [{
-    key: "add",
-    value: function add(fn, delay) {
-      this.queue.push({
-        fn: fn,
-        delay: delay
-      });
-    } // Go to the next in queue..
+  add(fn, delay) {
+    this.queue.push({
+      fn,
+      delay
+    });
+  } // Go to the next in queue..
 
-  }, {
-    key: "next",
-    value: function next() {
-      var _this = this;
 
-      var i = this.index++;
-      var at = this.queue[i];
+  next() {
+    const i = this.index++;
+    const at = this.queue[i];
 
-      if (!at) {
-        return;
-      }
-
-      var next = this.queue[this.index];
-      at.fn();
-
-      if (next) {
-        var delay = next.delay === undefined ? this.defaultDelay : next.delay;
-        setTimeout(function () {
-          return _this.next();
-        }, delay);
-      }
+    if (!at) {
+      return;
     }
-  }]);
 
-  return Queue;
-}();
+    const next = this.queue[this.index];
+    at.fn();
+
+    if (next) {
+      const delay = next.delay === undefined ? this.defaultDelay : next.delay;
+      setTimeout(() => this.next(), delay);
+    }
+  }
+
+}
 
 module.exports = Queue;
 
 },{}],9:[function(require,module,exports){
 (function (process){(function (){
-"use strict";
-
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
 // eslint-disable-next-line no-control-regex
-var actionMessageRegex = /^\u0001ACTION ([^\u0001]+)\u0001$/;
-var justinFanRegex = /^(justinfan)(\d+$)/;
-var unescapeIRCRegex = /\\([sn:r\\])/g;
-var escapeIRCRegex = /([ \n;\r\\])/g;
-var ircEscapedChars = {
+const actionMessageRegex = /^\u0001ACTION ([^\u0001]+)\u0001$/;
+const justinFanRegex = /^(justinfan)(\d+$)/;
+const unescapeIRCRegex = /\\([sn:r\\])/g;
+const escapeIRCRegex = /([ \n;\r\\])/g;
+const ircEscapedChars = {
   s: ' ',
   n: '',
   ':': ';',
   r: ''
 };
-var ircUnescapedChars = {
+const ircUnescapedChars = {
   ' ': 's',
   '\n': 'n',
   ';': ':',
   '\r': 'r'
 };
-var urlRegex = new RegExp("^(?:(?:https?|ftp)://)(?:\\S+(?::\\S*)?@)?(?:(?!(?:10|127)(?:\\.\\d{1,3}){3})(?!(?:169\\.254|192\\.168)(?:\\.\\d{1,3}){2})(?!172\\.(?:1[6-9]|2\\d|3[0-1])(?:\\.\\d{1,3}){2})(?:[1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])(?:\\.(?:1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}(?:\\.(?:[1-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))|(?:(?:[a-z\\u00a1-\\uffff0-9]-*)*[a-z\\u00a1-\\uffff0-9]+)(?:\\.(?:[a-z\\u00a1-\\uffff0-9]-*)*[a-z\\u00a1-\\uffff0-9]+)*(?:\\.(?:[a-z\\u00a1-\\uffff]{2,}))\\.?)(?::\\d{2,5})?(?:[/?#]\\S*)?$", 'i');
-var regexEmoteRegex = /[|\\^$*+?:#]/;
+const urlRegex = new RegExp('^(?:(?:https?|ftp)://)(?:\\S+(?::\\S*)?@)?(?:(?!(?:10|127)(?:\\.\\d{1,3}){3})(?!(?:169\\.254|192\\.168)(?:\\.\\d{1,3}){2})(?!172\\.(?:1[6-9]|2\\d|3[0-1])(?:\\.\\d{1,3}){2})(?:[1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])(?:\\.(?:1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}(?:\\.(?:[1-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))|(?:(?:[a-z\\u00a1-\\uffff0-9]-*)*[a-z\\u00a1-\\uffff0-9]+)(?:\\.(?:[a-z\\u00a1-\\uffff0-9]-*)*[a-z\\u00a1-\\uffff0-9]+)*(?:\\.(?:[a-z\\u00a1-\\uffff]{2,}))\\.?)(?::\\d{2,5})?(?:[/?#]\\S*)?$', 'i');
+const regexEmoteRegex = /[|\\^$*+?:#]/;
 
-var _ = module.exports = {
+const _ = module.exports = {
   // Return the second value if the first value is undefined..
-  get: function get(a, b) {
-    return typeof a === 'undefined' ? b : a;
-  },
+  get: (a, b) => typeof a === 'undefined' ? b : a,
   // Indirectly use hasOwnProperty
-  hasOwn: function hasOwn(obj, key) {
-    return {}.hasOwnProperty.call(obj, key);
-  },
+  hasOwn: (obj, key) => ({}).hasOwnProperty.call(obj, key),
   // Race a promise against a delay..
-  promiseDelay: function promiseDelay(time) {
-    return new Promise(function (resolve) {
-      return setTimeout(resolve, time);
-    });
-  },
+  promiseDelay: time => new Promise(resolve => setTimeout(resolve, time)),
   // Value is a finite number..
-  isFinite: function (_isFinite) {
-    function isFinite(_x) {
-      return _isFinite.apply(this, arguments);
-    }
+  isFinite: int => isFinite(int) && !isNaN(parseFloat(int)),
 
-    isFinite.toString = function () {
-      return _isFinite.toString();
-    };
-
-    return isFinite;
-  }(function (_int) {
-    return isFinite(_int) && !isNaN(parseFloat(_int));
-  }),
   // Parse string to number. Returns NaN if string can't be parsed to number..
-  toNumber: function toNumber(num, precision) {
+  toNumber(num, precision) {
     if (num === null) {
       return 0;
     }
 
-    var factor = Math.pow(10, _.isFinite(precision) ? precision : 0);
+    const factor = Math.pow(10, _.isFinite(precision) ? precision : 0);
     return Math.round(num * factor) / factor;
   },
+
   // Value is an integer..
-  isInteger: function isInteger(_int2) {
-    return !isNaN(_.toNumber(_int2, 0));
-  },
+  isInteger: int => !isNaN(_.toNumber(int, 0)),
   // Value is a regex..
-  isRegex: function isRegex(str) {
-    return regexEmoteRegex.test(str);
-  },
+  isRegex: str => regexEmoteRegex.test(str),
   // Value is a valid url..
-  isURL: function isURL(str) {
-    return urlRegex.test(str);
-  },
+  isURL: str => urlRegex.test(str),
   // Return a random justinfan username..
-  justinfan: function justinfan() {
-    return "justinfan".concat(Math.floor(Math.random() * 80000 + 1000));
-  },
+  justinfan: () => `justinfan${Math.floor(Math.random() * 80000 + 1000)}`,
   // Username is a justinfan username..
-  isJustinfan: function isJustinfan(username) {
-    return justinFanRegex.test(username);
-  },
+  isJustinfan: username => justinFanRegex.test(username),
+
   // Return a valid channel name..
-  channel: function channel(str) {
-    var channel = (str ? str : '').toLowerCase();
+  channel(str) {
+    const channel = (str ? str : '').toLowerCase();
     return channel[0] === '#' ? channel : '#' + channel;
   },
+
   // Return a valid username..
-  username: function username(str) {
-    var username = (str ? str : '').toLowerCase();
+  username(str) {
+    const username = (str ? str : '').toLowerCase();
     return username[0] === '#' ? username.slice(1) : username;
   },
-  // Return a valid token..
-  token: function token(str) {
-    return str ? str.toLowerCase().replace('oauth:', '') : '';
-  },
-  // Return a valid password..
-  password: function password(str) {
-    var token = _.token(str);
 
-    return token ? "oauth:".concat(token) : '';
+  // Return a valid token..
+  token: str => str ? str.toLowerCase().replace('oauth:', '') : '',
+
+  // Return a valid password..
+  password(str) {
+    const token = _.token(str);
+
+    return token ? `oauth:${token}` : '';
   },
-  actionMessage: function actionMessage(msg) {
-    return msg.match(actionMessageRegex);
-  },
+
+  actionMessage: msg => msg.match(actionMessageRegex),
+
   // Replace all occurences of a string using an object..
-  replaceAll: function replaceAll(str, obj) {
+  replaceAll(str, obj) {
     if (str === null || typeof str === 'undefined') {
       return null;
     }
 
-    for (var x in obj) {
+    for (const x in obj) {
       str = str.replace(new RegExp(x, 'g'), obj[x]);
     }
 
     return str;
   },
-  unescapeHtml: function unescapeHtml(safe) {
-    return safe.replace(/\\&amp\\;/g, '&').replace(/\\&lt\\;/g, '<').replace(/\\&gt\\;/g, '>').replace(/\\&quot\\;/g, '"').replace(/\\&#039\\;/g, '\'');
-  },
+
+  unescapeHtml: safe => safe.replace(/\\&amp\\;/g, '&').replace(/\\&lt\\;/g, '<').replace(/\\&gt\\;/g, '>').replace(/\\&quot\\;/g, '"').replace(/\\&#039\\;/g, '\''),
+
   // Escaping values:
   // http://ircv3.net/specs/core/message-tags-3.2.html#escaping-values
-  unescapeIRC: function unescapeIRC(msg) {
+  unescapeIRC(msg) {
     if (!msg || typeof msg !== 'string' || !msg.includes('\\')) {
       return msg;
     }
 
-    return msg.replace(unescapeIRCRegex, function (m, p) {
-      return p in ircEscapedChars ? ircEscapedChars[p] : p;
-    });
+    return msg.replace(unescapeIRCRegex, (m, p) => p in ircEscapedChars ? ircEscapedChars[p] : p);
   },
-  escapeIRC: function escapeIRC(msg) {
+
+  escapeIRC(msg) {
     if (!msg || typeof msg !== 'string') {
       return msg;
     }
 
-    return msg.replace(escapeIRCRegex, function (m, p) {
-      return p in ircUnescapedChars ? "\\".concat(ircUnescapedChars[p]) : p;
-    });
+    return msg.replace(escapeIRCRegex, (m, p) => p in ircUnescapedChars ? `\\${ircUnescapedChars[p]}` : p);
   },
+
   // Add word to a string..
-  addWord: function addWord(line, word) {
-    return line.length ? line + ' ' + word : line + word;
-  },
+  addWord: (line, word) => line.length ? line + ' ' + word : line + word,
+
   // Split a line but try not to cut a word in half..
-  splitLine: function splitLine(input, length) {
-    var lastSpace = input.substring(0, length).lastIndexOf(' '); // No spaces found, split at the very end to avoid a loop..
+  splitLine(input, length) {
+    let lastSpace = input.substring(0, length).lastIndexOf(' '); // No spaces found, split at the very end to avoid a loop..
 
     if (lastSpace === -1) {
       lastSpace = length - 1;
@@ -3268,11 +3059,12 @@ var _ = module.exports = {
 
     return [input.substring(0, lastSpace), input.substring(lastSpace + 1)];
   },
-  // Extract a number from a string..
-  extractNumber: function extractNumber(str) {
-    var parts = str.split(' ');
 
-    for (var i = 0; i < parts.length; i++) {
+  // Extract a number from a string..
+  extractNumber(str) {
+    const parts = str.split(' ');
+
+    for (let i = 0; i < parts.length; i++) {
       if (_.isInteger(parts[i])) {
         return ~~parts[i];
       }
@@ -3280,32 +3072,36 @@ var _ = module.exports = {
 
     return 0;
   },
+
   // Format the date..
-  formatDate: function formatDate(date) {
-    var hours = date.getHours();
-    var mins = date.getMinutes();
+  formatDate(date) {
+    let hours = date.getHours();
+    let mins = date.getMinutes();
     hours = (hours < 10 ? '0' : '') + hours;
     mins = (mins < 10 ? '0' : '') + mins;
-    return "".concat(hours, ":").concat(mins);
+    return `${hours}:${mins}`;
   },
+
   // Inherit the prototype methods from one constructor into another..
-  inherits: function inherits(ctor, superCtor) {
+  inherits(ctor, superCtor) {
     ctor.super_ = superCtor;
 
-    var TempCtor = function TempCtor() {};
+    const TempCtor = function () {};
 
     TempCtor.prototype = superCtor.prototype;
     ctor.prototype = new TempCtor();
     ctor.prototype.constructor = ctor;
   },
+
   // Return whether inside a Node application or not..
-  isNode: function isNode() {
+  isNode() {
     try {
-      return (typeof process === "undefined" ? "undefined" : _typeof(process)) === 'object' && Object.prototype.toString.call(process) === '[object process]';
+      return typeof process === 'object' && Object.prototype.toString.call(process) === '[object process]';
     } catch (e) {}
 
     return false;
   }
+
 };
 
 }).call(this)}).call(this,require('_process'))
