@@ -10,12 +10,12 @@ var glogal_badge_sets = new Object();
 var channel_badge_sets = new Object();
 
 async function start() {
-	if (url.searchParams.has("twitchChatToken")) {
-		token = url.searchParams.get("twitchChatToken")
-		localStorage.setItem("twitchChatToken", token)
+	if (url.searchParams.has("token")) {
+		token = url.searchParams.get("token")
+		// localStorage.setItem("twitchChatToken", token)
 	}
-	else
-		token = localStorage.getItem("twitchChatToken")
+	// else
+	// 	token = localStorage.getItem("twitchChatToken")
 
 	glogal_badge_sets = await getGlobalBadges();
 	console.log(glogal_badge_sets);
