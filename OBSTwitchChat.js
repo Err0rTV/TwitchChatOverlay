@@ -10,6 +10,13 @@ var glogal_badge_sets = new Object();
 var channel_badge_sets = new Object();
 
 async function start() {
+
+	document.body.innerHTML += `<div class="chat" id="chat" style="overflow: hidden; scroll-behavior: smooth;height: 100%; width: 100%; ">
+		<div id="test" class="fade" style="height: 100%; width: 100%;">
+			<div style="height: 200vw;"></div>
+		</div>
+	</div>`;
+
 	if (url.searchParams.has("token")) {
 		token = url.searchParams.get("token")
 		// localStorage.setItem("twitchChatToken", token)
@@ -282,13 +289,16 @@ async function showMsg(id, badges, name, nameColor, msg) {
 		if (Object.keys(badges).length > 0)
 			htmlBadges += `</div>`;
 	}
-	txt += `<div style='background: rgba(77, 77, 77, 0.4);' class='chatMsgContener'>
-						<div class='charMsgText' style='color:${nameColor};'><strong>${name}</strong>
-						</div>${htmlBadges}
-						<div class='charMsgText'>${msg}</div>
-					</div>`;
+	let messagebox = document.getElementById("messagebox-template").innerHTML;
 
-	add(id, txt + "<br>");
+	if (messagebox != null) {
+		messagebox = messagebox.replaceAll("${nameColor}", nameColor);
+		messagebox = messagebox.replaceAll("${name}", name);
+		messagebox = messagebox.replaceAll("${htmlBadges}", htmlBadges);
+		messagebox = messagebox.replaceAll("${msg}", msg);
+
+		add(id, messagebox + "<br>");
+	}
 }
 
 function delMsg(id) {

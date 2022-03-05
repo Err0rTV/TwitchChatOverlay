@@ -5,13 +5,16 @@
 </head>
 
 <body>
+	<template id="messagebox-template">
+		<div class='chatMsgContener'>
+			<div class='charMsgText' style='color:${nameColor};'><strong>${name}</strong>
+			</div>${htmlBadges}
+			<div class='charMsgText'>${msg}</div>
+		</div>
+	</template>
+
 	<!-- get token <a href="https://twitchapps.com/tmi/">here</a> -->
 
-	<div class="chat" id="chat" style="overflow: hidden; scroll-behavior: smooth;height: 100%; width: 100%; ">
-		<div id="test" class="fade" style="height: 100%; width: 100%;">
-			<div style="height: 200vw;"></div>
-		</div>
-	</div>
 </body>
 <script src="tmi.js"></script>
 <script src="OBSTwitchChat.js"></script>
