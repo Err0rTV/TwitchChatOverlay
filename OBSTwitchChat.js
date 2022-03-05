@@ -65,6 +65,12 @@ function start_chat(login,client_id) {
 			console.log(obj);
 		});
 
+		client.on('clearchat', (channel) => {
+			console.log("chat clear");
+			let ul = document.getElementById('test');
+			ul.innerHTML = '<div style="height: 200vw;"></div>';
+		});
+
 		client.on('messagedeleted', (channel, _username2, deletedMessage, tags) => {
 			console.log(channel);
 			console.log(_username2);
