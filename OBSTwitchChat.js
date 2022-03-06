@@ -78,7 +78,7 @@ function start_chat(login,client_id) {
 			console.log(tags);
 			delMsg(tags["target-msg-id"]);
 		});
-/*		{
+
 		client.on('message', (channel, tags, message, self) => {
 			if (tags.emotes != null) {
 				let map = new Array();
