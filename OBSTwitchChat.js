@@ -1,6 +1,7 @@
 
 var url = new URL(document.URL);
 var hideMessages = parseInt(url.searchParams.get("hideMessages"));
+var develop = parseInt(url.searchParams.get("develop"));
 var testMode = parseInt(url.searchParams.get("testMode"));
 if (hideMessages === NaN) hideMessages = 0;
 var token = "";
@@ -19,24 +20,36 @@ async function start() {
 
 	if (url.searchParams.has("token")) {
 		token = url.searchParams.get("token")
-		// localStorage.setItem("twitchChatToken", token)
+		if(token.startsWith("oauth:"))
+			if(develop === 1)
+				localStorage.setItem("twitchChatToken", token)
+		else
+		{
+			console.error("token should start with \" oauth:\"");
+			token = "";
+		}
 	}
-	// else
-	// 	token = localStorage.getItem("twitchChatToken")
+	else
+		token = localStorage.getItem("twitchChatToken")
 
 	glogal_badge_sets = await getGlobalBadges();
 	console.log(glogal_badge_sets);
-	if (token != "") {
-		const { user_id, login, client_id } = await getUserInfos(token);
-		console.log(user_id);
+	if (token != "" && token != null) {
+		const { user_id, login, client_id, status} = await getUserInfos(token);
+		console.log(status);
+		if(status != 200)
+			{
+				console.error("invalid token, please provide a valid token");
+				return;
+			}
 		channel_badge_sets = await getChannelBadges(user_id);
+		console.log(channel_badge_sets);
 		start_chat(login, client_id);
 	}
-	console.log(channel_badge_sets);
+	else
+		console.log("please provide a valid token");
 
-	if (testMode === 1){
-		testmsg();
-	}	
+	}
 }
 
 function start_chat(login,client_id) {
@@ -110,14 +123,22 @@ function start_chat(login,client_id) {
 }
 
 function getUserInfos(token) {
+	let status;
 	return fetch(`https://id.twitch.tv/oauth2/validate`, {
 		headers: new Headers({
 			'Authorization': 'Bearer ' + token.split(':')[1],
 		}),
 	})
-		.then(response => response.json())
+		.then(response => {
+			status = response.status;
+			return response.json();
+		})
 		.then(data => {
+			data.status = status;
 			return data;
+		})
+		.catch((error)=>{
+			console.error(error);
 		})
 }
 
