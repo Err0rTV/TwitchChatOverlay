@@ -20,12 +20,13 @@ async function start() {
 
 	if (url.searchParams.has("token")) {
 		token = url.searchParams.get("token")
-		if(token.startsWith("oauth:"))
+		if(token.startsWith("oauth:")) {
 			if(develop === 1)
 				localStorage.setItem("twitchChatToken", token)
+		}
 		else
 		{
-			console.error("token should start with \" oauth:\"");
+			console.error("token should start with \"oauth:\"");
 			token = "";
 		}
 	}
