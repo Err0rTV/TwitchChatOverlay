@@ -20,12 +20,13 @@ async function start() {
 
 	if (url.searchParams.has("token")) {
 		token = url.searchParams.get("token")
-		if(token.startsWith("oauth:"))
+		if(token.startsWith("oauth:")) {
 			if(develop === 1)
 				localStorage.setItem("twitchChatToken", token)
+		}
 		else
 		{
-			console.error("token should start with \" oauth:\"");
+			console.error("token should start with \"oauth:\"");
 			token = "";
 		}
 	}
@@ -35,23 +36,21 @@ async function start() {
 	glogal_badge_sets = await getGlobalBadges();
 	console.log(glogal_badge_sets);
 	if (token != "" && token != null) {
-		const { user_id, login, client_id, status} = await getUserInfos(token);
+		const { user_id, login, client_id, status } = await getUserInfos(token);
 		console.log(status);
-		if(status != 200)
-			{
-				console.error("invalid token, please provide a valid token");
-				return;
-			}
+		if (status != 200) {
+			console.error("invalid token, please provide a valid token");
+			return;
+		}
 		channel_badge_sets = await getChannelBadges(user_id);
 		console.log(channel_badge_sets);
 		start_chat(login, client_id);
-		if (testMode >= 1){
+		if (testMode >= 1) {
 			testmsg();
+		}		
 	}
 	else
 		console.log("please provide a valid token");
-
-	}
 }
 
 function start_chat(login,client_id) {
