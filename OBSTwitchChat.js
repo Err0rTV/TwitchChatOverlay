@@ -45,6 +45,8 @@ async function start() {
 		channel_badge_sets = await getChannelBadges(user_id);
 		console.log(channel_badge_sets);
 		start_chat(login, client_id);
+		if (testMode >= 1){
+			testmsg();
 	}
 	else
 		console.log("please provide a valid token");
@@ -352,7 +354,8 @@ async function testmsg() {
 	let color = choose_user_color(name);
 
 	showMsg("", dumybadges, name.userId, color, dumyText.substring(0, Math.random() * 50));
-	var t = setTimeout(() => { testmsg(); }, 100 + Math.random() * 15000);
+	if (testMode === 1)
+		var t = setTimeout(() => { testmsg(); }, 100 + Math.random() * 15000);
 }
 
 
