@@ -1,9 +1,96 @@
 <html>
 
 <head>
-	<link rel="stylesheet" href="styles.css">
 </head>
+<style>
+::-webkit-scrollbar { 
+    display: none; 
+}
 
+body { 
+    padding: 0px; 
+    margin: 0px;
+    background-color: black; 
+    /* opacity: 1.0;  */
+}
+
+.chat { 
+    position: absolute; 
+    width: 100%;
+}
+
+.chatMsgContener  {
+    background: rgba(77, 77, 77, 0.4);
+    padding: 5px;
+    margin-left:10px;
+    /* opacity:1; */
+}
+
+.charMsgText {
+    font-size: 36px;
+    font-family: 'Arial', cursive;
+    text-align: left;
+    color: white; 
+    /* opacity:1; */
+    margin-right: 10px;
+    margin-left: 0px;
+    display: inline;
+}
+
+.chatBadge {
+    height: 28px;
+    width: 28px;
+    /* opacity:1; */
+    margin-left: 5px;
+    /* vertical-align: middle; */
+}
+.chatBadge:first-of-type{
+    margin-left: 0px;
+}
+
+.chatBdadge_last {
+    height: 28px;
+    width: 28px;
+    /* opacity:1; */
+    margin-right: -0px;
+    margin-left: 0px;
+    vertical-align: middle;
+}
+                            
+.chatEmote {
+   height: 36px;
+    width: 36px;
+    opacity:1;
+    margin-right: 5px;
+    vertical-align: middle;
+}
+
+.fade div.hidden {
+    transition: all 1.0s ease-out;
+    opacity: 0;
+}
+
+.fade div.show {
+    opacity: 1;
+    transition: all 1.0s ease-out;
+}
+
+.fade div.hide {
+    opacity: 0.0;
+    transition: all 1.0s ease-out;
+}
+
+.fade div.show_noannim {
+    opacity: 1;
+    transition: all 0s ease 0s;
+}
+
+.fade div.hide_noannim {
+    opacity: 0;
+    transition: all 0s ease 0s;
+}
+
+</style>
 <body>
 	<template id="messagebox-template">
 		<div class='chatMsgContener'>
