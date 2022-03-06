@@ -288,7 +288,6 @@ function fade(li) {
 }
 
 async function showMsg(id, badges, name, nameColor, msg) {
-	let txt = "";
 	//<tr><td style='white-space: nowrap; vertical-align:top;'>";
 	console.log("visibilityState: " + document.visibilityState);
 
@@ -296,7 +295,7 @@ async function showMsg(id, badges, name, nameColor, msg) {
 	let htmlBadges = "";
 	if (badges != null) {
 		if (Object.keys(badges).length > 0)
-			htmlBadges += "<div class='charMsgText'>";
+			htmlBadges += "<span class=''>";
 
 		Object.entries(badges).forEach(([key, value]) => {
 
@@ -315,7 +314,7 @@ async function showMsg(id, badges, name, nameColor, msg) {
 		});
 
 		if (Object.keys(badges).length > 0)
-			htmlBadges += `</div>`;
+			htmlBadges += `</span>`;
 	}
 	let messagebox = document.getElementById("messagebox-template").innerHTML;
 

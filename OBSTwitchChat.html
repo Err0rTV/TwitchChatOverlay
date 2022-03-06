@@ -92,10 +92,11 @@ body {
 
 </style>
 <body>
-	<template id="messagebox-template">
+
+    <template id="messagebox-template">
 		<div class='chatMsgContener'>
-			<div class='charMsgText' style='color:${nameColor};'><strong>${name}</strong>
-			</div>${htmlBadges}
+			<div class='charMsgText' style='display: inline;color:${nameColor};'><strong>${name}</strong>
+			${htmlBadges}</div>
 			<div class='charMsgText'>${msg}</div>
 		</div>
 	</template>
