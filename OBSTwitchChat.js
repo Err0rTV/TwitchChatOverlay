@@ -85,18 +85,17 @@ function start_chat(login,client_id) {
 			ul.innerHTML = '<div style="height: 200vw;"></div>';
 		});
 
-		client.on('messagedeleted', (channel, _username2, deletedMessage, tags) => {
+		client.on('messagedeleted', (channel, _username2, deletedMessage, userstate) => {
 			console.log(channel);
 			console.log(_username2);
 			console.log(deletedMessage);
-			console.log(tags);
-			delMsg(tags["target-msg-id"]);
+			console.log(userstate);
+			delMsg(userstate["target-msg-id"]);
 		});
 
-		client.on('message', (channel, tags, message, self) => {
-			if (tags.emotes != null) {
+		client.on('message', (channel, userstate, message, self) => {
 				let map = new Array();
-				Object.entries(tags.emotes).forEach(([key, value]) => {
+				Object.entries(userstate.emotes).forEach(([key, value]) => {
 					console.log(key + " " + value);
 					let emoteIMG = getEmoteImg(key);
 
@@ -117,8 +116,8 @@ function start_chat(login,client_id) {
 			}
 
 			console.log(message);
-			console.log(tags);
-			showMsg(tags.id, tags.badges, tags["display-name"], tags.color ? tags.color : choose_user_color(tags["user-id"]), message)
+			console.log(userstate);
+			showMsg(userstate.id, userstate.badges, userstate["display-name"], userstate.color ? userstate.color : choose_user_color(userstate["user-id"]), message)
 		});
 	}
 }
