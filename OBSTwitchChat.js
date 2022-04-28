@@ -94,6 +94,9 @@ function start_chat(login,client_id) {
 		});
 
 		client.on('message', (channel, userstate, message, self) => {
+			if(userstate["message-type"] == "whisper")
+				return;
+			
 				let map = new Array();
 				Object.entries(userstate.emotes).forEach(([key, value]) => {
 					console.log(key + " " + value);
@@ -114,6 +117,9 @@ function start_chat(login,client_id) {
 					console.log(e.start + " " + (e.end + 1) + " " + message);
 				});
 			}
+
+			if(userstate["message-type"] == "action")
+				message = `<i>${message}</i>`;
 
 			console.log(message);
 			console.log(userstate);
