@@ -54,6 +54,15 @@ async function start() {
 }
 
 function start_chat(login,client_id) {
+	var botmap = new Map();
+	botlist.bots.forEach((e)=>{
+		botmap.set(e[0], true);
+
+	});
+	customBot.forEach((e)=>{
+		botmap.set(e, true);
+	})
+
 	if (token != "") {
 		const client = new tmi.Client({
 			options: { debug: true, 
@@ -98,6 +107,9 @@ function start_chat(login,client_id) {
 				return;
 			
 			if(message.charAt(0) === "!")
+				return;
+
+			if(botmap.get(userstate["username"]))
 				return;
 
 			if (userstate.emotes != null) {
