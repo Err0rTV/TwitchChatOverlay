@@ -97,6 +97,9 @@ function start_chat(login,client_id) {
 			if(userstate["message-type"] == "whisper")
 				return;
 			
+			if(message.charAt(0) === "!")
+				return;
+
 			if (userstate.emotes != null) {
 				let map = new Array();
 				Object.entries(userstate.emotes).forEach(([key, value]) => {
