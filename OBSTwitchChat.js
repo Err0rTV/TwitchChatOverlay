@@ -34,16 +34,13 @@ async function start() {
 		token = localStorage.getItem("twitchChatToken")
 
 	glogal_badge_sets = await getGlobalBadges();
-	console.log(glogal_badge_sets);
 	if (token != "" && token != null) {
 		const { user_id, login, client_id, status } = await getUserInfos(token);
-		console.log(status);
 		if (status != 200) {
 			console.error("invalid token, please provide a valid token");
 			return;
 		}
 		channel_badge_sets = await getChannelBadges(user_id);
-		console.log(channel_badge_sets);
 		start_chat(login, client_id);
 		if (testMode >= 1) {
 			testmsg();
@@ -90,8 +87,6 @@ function start_chat(login,client_id) {
 
 
 		client.on('emotesets', (sets, obj) => {
-			console.log(sets);
-			console.log(obj);
 		});
 
 		client.on('clearchat', (channel) => {
@@ -101,10 +96,6 @@ function start_chat(login,client_id) {
 		});
 
 		client.on('messagedeleted', (channel, _username2, deletedMessage, userstate) => {
-			console.log(channel);
-			console.log(_username2);
-			console.log(deletedMessage);
-			console.log(userstate);
 			delMsg(userstate["target-msg-id"]);
 		});
 
@@ -121,7 +112,6 @@ function start_chat(login,client_id) {
 			if (userstate.emotes != null) {
 				let map = new Array();
 				Object.entries(userstate.emotes).forEach(([key, value]) => {
-					console.log(key + " " + value);
 					let emoteIMG = getEmoteImg(key);
 
 
@@ -136,7 +126,6 @@ function start_chat(login,client_id) {
 				});
 
 				let end0 = message.length - 1;
-				console.log("lenght: " + end0);
 
 				map.forEach((e) => {
 					if (end0 !== e.end) {
@@ -145,7 +134,6 @@ function start_chat(login,client_id) {
 					end0 = e.start - 1;
 				});
 
-				console.log("lenght: " + end0);
 				if (end0 >= 0) {
 					map.unshift({ start: 0, end: end0, emoteIMG: escapeTag(message.substring(0, end0 + 1)) });
 				}
@@ -166,8 +154,6 @@ function start_chat(login,client_id) {
 			if(userstate["message-type"] == "action")
 				message = `<i>${message}</i>`;
 
-			console.log(message);
-			console.log(userstate);
 			showMsg(userstate.id, userstate.badges, userstate["display-name"], userstate.color ? userstate.color : choose_user_color(userstate["user-id"]), message)
 		});
 	}
@@ -223,7 +209,6 @@ function subStringReplace(string, replaceString, start, end) {
 var user_color = new Map();
 
 function choose_user_color(user) {
-	console.log("user: " + user);
 	if (user.color === '') {
 		let color = user_color.get(user.userId);
 		if (color === undefined) {
@@ -246,10 +231,8 @@ function choose_user_color(user) {
 				b *= a;
 			}
 
-			console.log(r + ":" + g + ":" + b);
 			color = "rgb(" + r + "," + g + "," + b + ")";
 			user_color.set(user.userId, color);
-			// console.log(color);
 		}
 		else {
 			return color;
@@ -274,7 +257,6 @@ function add(id, txt) {
 	li.innerHTML = txt;
 	ul.appendChild(li);
 	if (document.visibilityState === "visible") {
-		console.log("anim");
 		setTimeout(function () {
 			chatDiv.style.scrollBehavior = "smooth";
 			li.className = "fade div show";
@@ -282,7 +264,6 @@ function add(id, txt) {
 		setTimeout(() => { li.scrollIntoView({ behavior: "smooth" }) }, 10);
 	}
 	else {
-		console.log("noanim");
 		chatDiv.style.scrollBehavior = "auto";
 		chatDiv.scrollTop = chatDiv.scrollHeight;
 		chatDiv.style.scrollBehavior = "smooth";
@@ -290,9 +271,7 @@ function add(id, txt) {
 	}
 
 	if (hideMessages === 1) {
-		console.log("22");
 		setTimeout(async () => {
-			console.log("hide message");
 			if (document.visibilityState === "visible") {
 				li.className = "fade div hide";
 				setTimeout(async () => {
@@ -311,11 +290,7 @@ function add(id, txt) {
 	li.timerInterval = setInterval(() => {
 		let boundingLi = li.getBoundingClientRect();
 		let boundingUl = ul.getBoundingClientRect();
-		// console.log(li.offsetBottom);
-		// console.log(ul.scrollHeight);
-		// console.log(ul.clientHeight);
-		// console.log(ul.getBoundingClientRect());
-		// console.log(li.getBoundingClientRect());
+
 		if (boundingLi.top < 0) {
 			li.className = "fade div hide";
 			clearInterval(li.timerInterval);
@@ -324,8 +299,6 @@ function add(id, txt) {
 			}, 11000);
 		}
 	}, 1000);
-
-	console.log("add");
 }
 
 function fade(li) {
@@ -348,8 +321,6 @@ async function showMsg(id, badges, name, nameColor, msg) {
 			htmlBadges += "<span class=''>";
 
 		Object.entries(badges).forEach(([key, value]) => {
-
-			console.log(channel_badge_sets[key]);
 			let badge;
 			if (channel_badge_sets[key] != null) {
 				if (channel_badge_sets[key].versions[value] != undefined)
