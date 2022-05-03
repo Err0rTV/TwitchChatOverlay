@@ -53,6 +53,12 @@ async function start() {
 		console.log("please provide a valid token");
 }
 
+function escapeTag(txt) {
+	let buf = document.createElement("textarea");
+	buf.innerText = txt;
+	return buf.innerHTML;
+}
+
 function start_chat(login,client_id) {
 	var botmap = new Map();
 	botlist.bots.forEach((e)=>{
@@ -128,10 +134,33 @@ function start_chat(login,client_id) {
 				map.sort((firstEl, secondEl) => {
 					return secondEl.start - firstEl.start;
 				});
-				map.forEach(e => {
-					message = subStringReplace(message, e.emoteIMG, e.start, (e.end + 1));
-					console.log(e.start + " " + (e.end + 1) + " " + message);
+
+				let end0 = message.length - 1;
+				console.log("lenght: " + end0);
+
+				map.forEach((e) => {
+					if (end0 !== e.end) {
+						map.unshift({ start: e.end + 1, end: end0, emoteIMG: escapeTag(message.substring(e.end + 1, end0 + 1)) });
+					}
+					end0 = e.start - 1;
 				});
+
+				console.log("lenght: " + end0);
+				if (end0 >= 0) {
+					map.unshift({ start: 0, end: end0, emoteIMG: escapeTag(message.substring(0, end0 + 1)) });
+				}
+
+				map.sort((firstEl, secondEl) => {
+					return firstEl.start - secondEl.start;
+				});
+
+				message = "";
+				map.forEach((e) => {
+					message += e.emoteIMG;
+				})
+			}
+			else {
+				message = escapeTag(message);
 			}
 
 			if(userstate["message-type"] == "action")
