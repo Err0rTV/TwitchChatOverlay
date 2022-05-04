@@ -111,6 +111,7 @@ function start_chat(login,client_id) {
 
 			if (userstate.emotes != null) {
 				let map = new Array();
+				let map2 = new Array();
 				Object.entries(userstate.emotes).forEach(([key, value]) => {
 					let emoteIMG = getEmoteImg(key);
 
@@ -129,14 +130,16 @@ function start_chat(login,client_id) {
 
 				map.forEach((e) => {
 					if (end0 !== e.end) {
-						map.unshift({ start: e.end + 1, end: end0, emoteIMG: escapeTag(message.substring(e.end + 1, end0 + 1)) });
+						map2.unshift({ start: e.end + 1, end: end0, emoteIMG: escapeTag(message.substring(e.end + 1, end0 + 1)) });
 					}
 					end0 = e.start - 1;
 				});
 
 				if (end0 >= 0) {
-					map.unshift({ start: 0, end: end0, emoteIMG: escapeTag(message.substring(0, end0 + 1)) });
+					map2.unshift({ start: 0, end: end0, emoteIMG: escapeTag(message.substring(0, end0 + 1)) });
 				}
+
+				map = map.concat(map2);
 
 				map.sort((firstEl, secondEl) => {
 					return firstEl.start - secondEl.start;
