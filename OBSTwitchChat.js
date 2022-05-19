@@ -157,7 +157,9 @@ function start_chat(login,client_id) {
 			if(userstate["message-type"] == "action")
 				message = `<i>${message}</i>`;
 
-			showMsg(userstate.id, userstate.badges, userstate["display-name"], userstate.color ? userstate.color : choose_user_color(userstate["user-id"]), message)
+			showMsg(userstate.id, userstate.badges, userstate["display-name"], 
+					userstate.color ? userstate.color : choose_user_color(userstate["user-id"]), 
+					message)
 		});
 	}
 }
@@ -212,7 +214,7 @@ function subStringReplace(string, replaceString, start, end) {
 var user_color = new Map();
 
 function choose_user_color(user) {
-	if (user.color === '') {
+	if (user.color === null || user.color === undefined || user.color === '' ) {
 		let color = user_color.get(user.userId);
 		if (color === undefined) {
 			const threshold = 25;
@@ -371,7 +373,7 @@ async function testmsg() {
 
 	let name = new Object();
 	name.userId = dumyText.replace(" ", "").substring(0, 4 + Math.random() * 21);
-	name.color = "";
+	name.color = null;
 
 	let color = choose_user_color(name);
 
