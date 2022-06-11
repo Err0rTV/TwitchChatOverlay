@@ -10,6 +10,8 @@ var token = "";
 var glogal_badge_sets = new Object();
 var channel_badge_sets = new Object();
 
+var bttv_emotes = new Map();
+
 async function start() {
 
 	document.body.innerHTML += `<div class="chat" id="chat" style="overflow: hidden; scroll-behavior: smooth;height: 100%; width: 100%; ">
@@ -33,6 +35,9 @@ async function start() {
 	else
 		token = localStorage.getItem("twitchChatToken")
 
+	getFFGlobalEmotes();
+	getBTTVGlobalEmotes();
+
 	glogal_badge_sets = await getGlobalBadges();
 	if (token != "" && token != null) {
 		const { user_id, login, client_id, status } = await getUserInfos(token);
@@ -41,6 +46,9 @@ async function start() {
 			return;
 		}
 		channel_badge_sets = await getChannelBadges(user_id);
+		getBTTVChannelEmotes(user_id);
+		getFFChannelEmotes(user_id);
+
 		start_chat(login, client_id);
 		if (testMode >= 1) {
 			testmsg();
@@ -154,7 +162,33 @@ function start_chat(login,client_id) {
 				message = escapeTag(message);
 			}
 
-			if(userstate["message-type"] == "action")
+			let regex = /([^.;, \n]+)/gm;
+
+			function f(correspondance, p1, decalage, chaine)
+			{
+				// console.log("---------------");
+				// console.log(correspondance);
+				// console.log(p1);
+				// console.log(decalage);
+				// // console.log(chaine);
+				// console.log("---------------");
+
+				let img = bttv_emotes.get(correspondance);
+
+				
+				if(img)
+				{
+					img = `<img class="chatEmote" src="${img}">`;
+					return img;
+				}
+				else
+					return correspondance;
+			}
+
+			message = message.replace(regex, f );
+
+
+			if (userstate["message-type"] == "action")
 				message = `<i>${message}</i>`;
 
 			showMsg(userstate.id, userstate.badges, userstate["display-name"], 
@@ -199,6 +233,68 @@ function getGlobalBadges() {
 			return data.badge_sets;
 		})
 }
+
+function getFFGlobalEmotes() {
+	return fetch("https://api.betterttv.net/3/cached/frankerfacez/emotes/global")
+		.then(response => response.json())
+		.then(data => {
+
+			data.forEach(e => {
+				let img;
+				if(e.images["4x"] != null) img = e.images["4x"];
+				else if(e.images["2x"] != null) img = e.images["2x"];
+				else if(e.images["1x"] != null) img = e.images["1x"];
+				
+				bttv_emotes.set(e.code, img);
+			});
+		})
+}
+
+function getBTTVGlobalEmotes() {
+	return fetch("https://api.betterttv.net/3/cached/emotes/global")
+		.then(response => response.json())
+		.then(data => {
+
+			data.forEach(e => {
+				bttv_emotes.set(e.code, `https://cdn.betterttv.net/emote/${e.id}/3x`);
+			});
+		})
+}
+
+function getBTTVChannelEmotes(user_id) {
+	return fetch(`https://api.betterttv.net/3/cached/users/twitch/${user_id}`)
+		.then(response => {
+			console.log(response.status);
+			if(response.status == 200)
+				return response.json()
+			else
+				return {channelEmotes: Array(), sharedEmotes: Array()};
+		})
+		.then(data => {
+			console.log(data);
+			data.channelEmotes.forEach(e => {
+				bttv_emotes.set(e.code, `https://cdn.betterttv.net/emote/${e.id}/3x`);
+			});
+			data.sharedEmotes.forEach(e => {
+				bttv_emotes.set(e.code, `https://cdn.betterttv.net/emote/${e.id}/3x`);
+			});
+		})
+}
+
+function getFFChannelEmotes(user_id) {
+	
+	return fetch(`https://api.betterttv.net/3/cached/frankerfacez/users/twitch/${user_id}`)
+		.then(response => response.json())
+		.then(data => {
+			data.forEach(e => {
+				let img;
+				if(e.images["4x"] != null) img = e.images["4x"];
+				else if(e.images["2x"] != null) img = e.images["2x"];
+				else if(e.images["1x"] != null) img = e.images["1x"];
+
+				bttv_emotes.set(e.code, `${img}`);
+			});
+		})}
 
 function getEmoteImg(emoteId) {
 	return `<img class="chatEmote" src="https://static-cdn.jtvnw.net/emoticons/v2/${emoteId}/default/dark/3.0">`;
