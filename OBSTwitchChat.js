@@ -457,7 +457,10 @@ async function showMsg(id, badges, name, nameColor, msg) {
 
 	if (messagebox != null) {
 		messagebox = messagebox.replaceAll("${nameColor}", nameColor);
-		messagebox = messagebox.replaceAll("${name}", name);
+		if(name == "lesmalous")
+			messagebox = messagebox.replaceAll("${name}", `	<span class="block-line"><span><span style="color:#ff0000;">l</span><span style="color:#ffaa00;">e</span><span style="color:#aaff00;">s</span><span style="color:#00ff00;">m</span><span style="color:#00ffaa;">a</span><span style="color:#00aaff;">l</span><span style="color:#0000ff;">o</span><span style="color:#aa00ff;">u</span><span style="color:#ff00aa;">s</span></span></span>`);
+		else
+			messagebox = messagebox.replaceAll("${name}", name);
 		messagebox = messagebox.replaceAll("${htmlBadges}", htmlBadges);
 		messagebox = messagebox.replaceAll("${msg}", msg);
 
