@@ -1,11 +1,28 @@
+var token;
+var hideMessages;
+var testMode;
+var mergeMessage;
+var develop;
 
-var url = new URL(document.URL);
-var hideMessages = parseInt(url.searchParams.get("hideMessages"));
-var develop = parseInt(url.searchParams.get("develop"));
-var testMode = parseInt(url.searchParams.get("testMode"));
-if (hideMessages === NaN) hideMessages = 0;
-var token = "";
+document.body.innerHTML += `<div class="chat" id="chat" style="overflow: hidden; scroll-behavior: smooth;height: 100%; width: 100%; ">
+<div id="test" class="fade" style="height: 100%; width: 100%;">
+	<div style="height: 200vw;"></div>
+</div>
+</div>`;
 
+function getOption(optionName)
+{
+	let url = new URL(document.URL);
+	let chatElement = document.getElementById("chat");
+	let optionValue = getComputedStyle(chatElement).getPropertyValue("--chatbox-" + optionName)
+	if (optionValue == "")
+		optionValue = url.searchParams.get(optionName);
+	if(!optionValue)
+		optionValue = "";
+	return optionValue;
+}
+
+setTimeout( start, 500);
 
 var glogal_badge_sets = new Object();
 var channel_badge_sets = new Object();
@@ -13,15 +30,12 @@ var channel_badge_sets = new Object();
 var bttv_emotes = new Map();
 
 async function start() {
-
-	document.body.innerHTML += `<div class="chat" id="chat" style="overflow: hidden; scroll-behavior: smooth;height: 100%; width: 100%; ">
-		<div id="test" class="fade" style="height: 100%; width: 100%;">
-			<div style="height: 200vw;"></div>
-		</div>
-	</div>`;
-
-	if (url.searchParams.has("token")) {
-		token = url.searchParams.get("token")
+	
+	hideMessages = parseInt(getOption("hideMessages"));
+	testMode = parseInt(getOption("testMode"));
+	token = getOption("token");
+	
+	if (token) {
 		if(token.startsWith("oauth:")) {
 			if(develop === 1)
 				localStorage.setItem("twitchChatToken", token)
@@ -43,19 +57,20 @@ async function start() {
 		const { user_id, login, client_id, status } = await getUserInfos(token);
 		if (status != 200) {
 			console.error("invalid token, please provide a valid token");
-			return;
 		}
-		channel_badge_sets = await getChannelBadges(user_id);
-		getBTTVChannelEmotes(user_id);
-		getFFChannelEmotes(user_id);
-
-		start_chat(login, client_id);
-		if (testMode >= 1) {
-			testmsg();
-		}		
+		else {
+			channel_badge_sets = await getChannelBadges(user_id);
+			getBTTVChannelEmotes(user_id);
+			getFFChannelEmotes(user_id);
+			start_chat(login, client_id);
+		}
 	}
 	else
 		console.log("please provide a valid token");
+
+	if (testMode >= 1) {
+		testmsg();
+	}		
 }
 
 function escapeTag(txt) {
@@ -477,6 +492,3 @@ async function testmsg() {
 	if (testMode === 1)
 		var t = setTimeout(() => { testmsg(); }, 100 + Math.random() * 15000);
 }
-
-
-start();
