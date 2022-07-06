@@ -11,8 +11,8 @@
     body {
         padding: 0px;
         margin: 0px;
-        background-color: black;
-        /* opacity: 1.0;  */
+        background-color: rgba(0, 0, 0, 0);
+        overflow: hidden;
     }
 
     .chat {
@@ -88,7 +88,7 @@
 
     <template id="messagebox-template">
         <div class='chatMsgContener'>
-            <div class='charMsgText' style='display: inline;color:${nameColor};'><strong>${name}</strong>
+            <div class='charMsgText' style='color:${nameColor};'><strong>${name}</strong>
                 ${htmlBadges}</div>
             <div class='charMsgText'>${msg}</div>
         </div>

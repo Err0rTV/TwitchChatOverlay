@@ -30,11 +30,11 @@ var channel_badge_sets = new Object();
 var bttv_emotes = new Map();
 
 async function start() {
-	
+
 	hideMessages = parseInt(getOption("hideMessages"));
 	testMode = parseInt(getOption("testMode"));
-	token = getOption("token");
-	
+	token = getOption("token").replaceAll(" ", "");
+
 	if (token) {
 		if(token.startsWith("oauth:")) {
 			if(develop === 1)
