@@ -4,103 +4,103 @@
 <head>
 </head>
 <style>
-::-webkit-scrollbar { 
-    display: none; 
-}
+    ::-webkit-scrollbar {
+        display: none;
+    }
 
-body { 
-    padding: 0px; 
-    margin: 0px;
-    background-color: black; 
-    /* opacity: 1.0;  */
-}
+    body {
+        padding: 0px;
+        margin: 0px;
+        background-color: black;
+        /* opacity: 1.0;  */
+    }
 
-.chat { 
-    position: absolute; 
-    width: 100%;
-}
+    .chat {
+        position: absolute;
+        width: 100%;
+    }
 
-.chatMsgContener  {
-    background: rgba(77, 77, 77, 0.4);
-    padding: 5px;
-    margin-left:10px;
-    /* opacity:1; */
-}
+    .chatMsgContener {
+        background: rgba(77, 77, 77, 0.4);
+        padding: 5px;
+        margin-left: 10px;
+        /* opacity:1; */
+    }
 
-.charMsgText {
-    font-size: 36px;
-    font-family: 'Arial', cursive;
-    text-align: left;
-    color: white; 
-    /* opacity:1; */
-    margin-right: 10px;
-    margin-left: 0px;
-    display: inline;
-}
+    .charMsgText {
+        font-size: 36px;
+        font-family: 'Arial', cursive;
+        text-align: left;
+        color: white;
+        /* opacity:1; */
+        margin-right: 10px;
+        margin-left: 0px;
+        display: inline;
+    }
 
-.chatBadge {
-    height: 28px;
-    width: 28px;
-    /* opacity:1; */
-    margin-left: 5px;
-    /* vertical-align: middle; */
+    .chatBadge {
+        height: 28px;
+        width: 28px;
+        /* opacity:1; */
+        margin-left: 5px;
+        /* vertical-align: middle; */
     }
 
     .chatBadge:first-of-type {
         margin-left: 0px;
     }
-                            
-.chatEmote {
-    height: 36px;
-    /* width: 36px; */
-    opacity:1;
-    margin-right: 5px;
-    vertical-align: middle;
-}
 
-.fade div.hidden {
-    transition: all 1.0s ease-out;
-    opacity: 0;
-}
+    .chatEmote {
+        height: 36px;
+        /* width: 36px; */
+        opacity: 1;
+        margin-right: 5px;
+        vertical-align: middle;
+    }
 
-.fade div.show {
-    opacity: 1;
-    transition: all 1.0s ease-out;
-}
+    .fade div.hidden {
+        transition: all 1.0s ease-out;
+        opacity: 0;
+    }
 
-.fade div.hide {
-    opacity: 0.0;
-    transition: all 1.0s ease-out;
-}
+    .fade div.show {
+        opacity: 1;
+        transition: all 1.0s ease-out;
+    }
 
-.fade div.show_noannim {
-    opacity: 1;
-    transition: all 0s ease 0s;
-}
+    .fade div.hide {
+        opacity: 0.0;
+        transition: all 1.0s ease-out;
+    }
 
-.fade div.hide_noannim {
-    opacity: 0;
-    transition: all 0s ease 0s;
-}
+    .fade div.show_noannim {
+        opacity: 1;
+        transition: all 0s ease 0s;
+    }
 
+    .fade div.hide_noannim {
+        opacity: 0;
+        transition: all 0s ease 0s;
+    }
 </style>
+
 <body>
 
     <template id="messagebox-template">
-		<div class='chatMsgContener'>
-			<div class='charMsgText' style='display: inline;color:${nameColor};'><strong>${name}</strong>
-			${htmlBadges}</div>
-			<div class='charMsgText'>${msg}</div>
-		</div>
-	</template>
+        <div class='chatMsgContener'>
+            <div class='charMsgText' style='display: inline;color:${nameColor};'><strong>${name}</strong>
+                ${htmlBadges}</div>
+            <div class='charMsgText'>${msg}</div>
+        </div>
+    </template>
 
-	<!-- get token <a href="https://twitchapps.com/tmi/">here</a> -->
+    <!-- get token <a href="https://twitchapps.com/tmi/">here</a> -->
 
 </body>
 <script>
     customBot = [
         "syntax_terr0r"
-        ];
+    ];
 </script>
 <script src="botlist.js"></script>
 <script src="tmi.js"></script>
