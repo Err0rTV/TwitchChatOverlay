@@ -24,7 +24,6 @@
         background: rgba(77, 77, 77, 0.4);
         padding: 5px;
         margin-left: 10px;
-        /* opacity:1; */
     }
 
     .charMsgText {
@@ -32,7 +31,6 @@
         font-family: 'Arial', cursive;
         text-align: left;
         color: white;
-        /* opacity:1; */
         margin-right: 10px;
         margin-left: 0px;
         display: inline;
@@ -40,19 +38,18 @@
 
     .chatBadge {
         height: 28px;
-        width: 28px;
-        /* opacity:1; */
         margin-left: 5px;
-        /* vertical-align: middle; */
+        margin-right: 0px;
+        display: inline;
     }
 
     .chatBadge:first-of-type {
         margin-left: 0px;
+        margin-right: 0px;
     }
 
     .chatEmote {
         height: 36px;
-        /* width: 36px; */
         opacity: 1;
         margin-right: 5px;
         vertical-align: middle;
@@ -85,10 +82,11 @@
 </style>
 
 <body>
+    <template id=announceBadge><figure class="chatBadge"><svg type="color-fill-current" version="1.1" viewBox="0 0 20 20" x="0px" y="0px" class="chatBadge"><path fill-rule="evenodd" clip-rule="evenodd" d="M11 14l7 4V2l-7 4H4a2 2 0 00-2 2v4a2 2 0 002 2h2v4h2v-4h3zm1-6.268l4-2.286v9.108l-4-2.286V7.732zM10 12H4V8h6v4z"></path></svg></figure></template>
 
     <template id="messagebox-template">
         <div class='chatMsgContener'>
-            <div class='charMsgText' style='color:${nameColor};'><strong>${name}</strong>
+            <div class='charMsgText' style='color:${nameColor};'><strong>${announce}${name}</strong>
                 ${htmlBadges}</div>
             <div class='charMsgText'>${msg}</div>
         </div>

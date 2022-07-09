@@ -4,6 +4,8 @@ var testMode;
 var mergeMessage;
 var develop;
 
+const annouceBadge = document.getElementById("announceBadge").innerHTML;
+
 document.body.innerHTML += `<div class="chat" id="chat" style="overflow: hidden; scroll-behavior: smooth;height: 100%; width: 100%; ">
 <div id="test" class="fade" style="height: 100%; width: 100%;">
 	<div style="height: 200vw;"></div>
@@ -68,9 +70,8 @@ async function start() {
 	else
 		console.log("please provide a valid token");
 
-	if (testMode >= 1) {
-		testmsg();
-	}		
+	if (testMode == 1) testmsg();
+	if (testMode == 2) testannounce();
 }
 
 function escapeTag(txt) {
@@ -122,93 +123,23 @@ function start_chat(login,client_id) {
 			delMsg(userstate["target-msg-id"]);
 		});
 
+		client.on('announcement', (channel, tags, message, self, color) => {
+			showMsg({channel: channel, userstate: tags, message: message, self: self, color: color});
+		});
+
 		client.on('message', (channel, userstate, message, self) => {
-			if(userstate["message-type"] == "whisper")
+
+			// filter unwanted messages
+			if(userstate["message-type"] === "whisper")
 				return;
-			
+
 			if(message.charAt(0) === "!")
 				return;
 
 			if(botmap.get(userstate["username"]))
 				return;
 
-			if (userstate.emotes != null) {
-				let map = new Array();
-				let map2 = new Array();
-				Object.entries(userstate.emotes).forEach(([key, value]) => {
-					let emoteIMG = getEmoteImg(key);
-
-
-					value.forEach(e => {
-						let s = e.split('-');
-						map.push({ start: parseInt(s[0]), end: parseInt(s[1]), emoteIMG: getEmoteImg(key) });
-					});
-				});
-
-				map.sort((firstEl, secondEl) => {
-					return secondEl.start - firstEl.start;
-				});
-
-				let end0 = message.length - 1;
-
-				map.forEach((e) => {
-					if (end0 !== e.end) {
-						map2.unshift({ start: e.end + 1, end: end0, emoteIMG: escapeTag(message.substring(e.end + 1, end0 + 1)) });
-					}
-					end0 = e.start - 1;
-				});
-
-				if (end0 >= 0) {
-					map2.unshift({ start: 0, end: end0, emoteIMG: escapeTag(message.substring(0, end0 + 1)) });
-				}
-
-				map = map.concat(map2);
-
-				map.sort((firstEl, secondEl) => {
-					return firstEl.start - secondEl.start;
-				});
-
-				message = "";
-				map.forEach((e) => {
-					message += e.emoteIMG;
-				})
-			}
-			else {
-				message = escapeTag(message);
-			}
-
-			let regex = /([^.;, \n]+)/gm;
-
-			function f(correspondance, p1, decalage, chaine)
-			{
-				// console.log("---------------");
-				// console.log(correspondance);
-				// console.log(p1);
-				// console.log(decalage);
-				// // console.log(chaine);
-				// console.log("---------------");
-
-				let img = bttv_emotes.get(correspondance);
-
-				
-				if(img)
-				{
-					img = `<img class="chatEmote" src="${img}">`;
-					return img;
-				}
-				else
-					return correspondance;
-			}
-
-			message = message.replace(regex, f );
-
-
-			if (userstate["message-type"] == "action")
-				message = `<i>${message}</i>`;
-
-			showMsg(userstate.id, userstate.badges, userstate["display-name"], 
-					userstate.color ? userstate.color : choose_user_color(userstate["user-id"]), 
-					message)
+			showMsg({channel: channel, userstate: userstate, message: message, self: self});
 		});
 	}
 }
@@ -324,41 +255,32 @@ function subStringReplace(string, replaceString, start, end) {
 
 var user_color = new Map();
 
-function choose_user_color(user) {
-	if (user.color === null || user.color === undefined || user.color === '' ) {
-		let color = user_color.get(user.userId);
-		if (color === undefined) {
-			const threshold = 25;
-			const offset = 50;
-			r = Math.round((Math.random() * 200) + 25);
-			g = Math.round((Math.random() * 200) + 25);
-			b = Math.round((Math.random() * 200) + 25);
-			// check for grey color
-			if (Math.abs(g - r) < threshold) (g + offset) % 256;
-			if (Math.abs(b - g) < threshold) (b + offset) % 256;
+function choose_user_color(userId) {
+	let color = user_color.get(userId);
+	if (color === undefined) {
+		const threshold = 25;
+		const offset = 50;
+		r = Math.round((Math.random() * 200) + 25);
+		g = Math.round((Math.random() * 200) + 25);
+		b = Math.round((Math.random() * 200) + 25);
+		// check for grey color
+		if (Math.abs(g - r) < threshold) (g + offset) % 256;
+		if (Math.abs(b - g) < threshold) (b + offset) % 256;
 
-			// check for color intensity
-			a = r + g + b;
-			if (a < 170) {
-				a = 170 / a;
-				// a = 51 - (a / 3); // case 0: 150 care 150: 1    50-a 
-				r *= a;
-				g *= a;
-				b *= a;
-			}
-
-			color = "rgb(" + r + "," + g + "," + b + ")";
-			user_color.set(user.userId, color);
-		}
-		else {
-			return color;
+		// check for color intensity
+		a = r + g + b;
+		if (a < 170) {
+			a = 170 / a;
+			r *= a;
+			g *= a;
+			b *= a;
 		}
 
-		return color;
+		color = "rgb(" + r + "," + g + "," + b + ")";
+		user_color.set(userId, color);
 	}
-	else {
-		return user.color;
-	}
+
+	return color;
 }
 
 
@@ -426,17 +348,17 @@ function fade(li) {
 		})
 }
 
-async function showMsg(id, badges, name, nameColor, msg) {
+async function showMsg(twitchMsg) {
 	//<tr><td style='white-space: nowrap; vertical-align:top;'>";
-	console.log("visibilityState: " + document.visibilityState);
+	// console.log("visibilityState: " + document.visibilityState);
 
 	// badges
 	let htmlBadges = "";
-	if (badges != null) {
-		if (Object.keys(badges).length > 0)
+	if (twitchMsg.userstate.badges != null) {
+		if (Object.keys(twitchMsg.userstate.badges).length > 0)
 			htmlBadges += "<span class=''>";
 
-		Object.entries(badges).forEach(([key, value]) => {
+		Object.entries(twitchMsg.userstate.badges).forEach(([key, value]) => {
 			let badge;
 			if (channel_badge_sets[key] != null) {
 				if (channel_badge_sets[key].versions[value] != undefined)
@@ -450,21 +372,98 @@ async function showMsg(id, badges, name, nameColor, msg) {
 			htmlBadges += `<img class='chatBadge' src='${badge}'>`;
 		});
 
-		if (Object.keys(badges).length > 0)
+		if (Object.keys(twitchMsg.userstate.badges).length > 0)
 			htmlBadges += `</span>`;
 	}
+	
+	// twitch emotes processing
+	if (twitchMsg.userstate.emotes != null) {
+		let map = new Array();
+		let map2 = new Array();
+		Object.entries(twitchMsg.userstate.emotes).forEach(([key, value]) => {
+			let emoteIMG = getEmoteImg(key);
+
+
+			value.forEach(e => {
+				let s = e.split('-');
+				map.push({ start: parseInt(s[0]), end: parseInt(s[1]), emoteIMG: getEmoteImg(key) });
+			});
+		});
+
+		map.sort((firstEl, secondEl) => {
+			return secondEl.start - firstEl.start;
+		});
+
+		let end0 = twitchMsg.message.length - 1;
+
+		map.forEach((e) => {
+			if (end0 !== e.end) {
+				map2.unshift({ start: e.end + 1, end: end0, emoteIMG: escapeTag(twitchMsg.message.substring(e.end + 1, end0 + 1)) });
+			}
+			end0 = e.start - 1;
+		});
+
+		if (end0 >= 0) {
+			map2.unshift({ start: 0, end: end0, emoteIMG: escapeTag(twitchMsg.message.substring(0, end0 + 1)) });
+		}
+
+		map = map.concat(map2);
+
+		map.sort((firstEl, secondEl) => {
+			return firstEl.start - secondEl.start;
+		});
+
+		twitchMsg.message = "";
+		map.forEach((e) => {
+			twitchMsg.message += e.emoteIMG;
+		})
+	}
+	else {
+		twitchMsg.message = escapeTag(twitchMsg.message);
+	}
+
+	// bttv emotes processing
+	let regex = /([^.;, \n]+)/gm;
+	function f(correspondance, p1, decalage, chaine) {
+		// console.log("---------------");
+		// console.log(correspondance);
+		// console.log(p1);
+		// console.log(decalage);
+		// // console.log(chaine);
+		// console.log("---------------");
+
+		let img = bttv_emotes.get(correspondance);
+
+
+		if (img) {
+			img = `<img class="chatEmote" src="${img}">`;
+			return img;
+		}
+		else
+			return correspondance;
+	}
+
+	twitchMsg.message = twitchMsg.message.replace(regex, f);
+
+
+	if (twitchMsg.userstate["message-type"] == "action")
+	twitchMsg.message = `<i>${twitchMsg.message}</i>`;
+
+
+	// HTML element creation
 	let messagebox = document.getElementById("messagebox-template").innerHTML;
 
 	if (messagebox != null) {
-		messagebox = messagebox.replaceAll("${nameColor}", nameColor);
+		messagebox = messagebox.replaceAll("${nameColor}", twitchMsg.userstate.color ? twitchMsg.userstate.color : choose_user_color(twitchMsg.userstate["user-id"]));
 		if(name == "lesmalous")
 			messagebox = messagebox.replaceAll("${name}", `	<span class="block-line"><span><span style="color:#ff0000;">l</span><span style="color:#ffaa00;">e</span><span style="color:#aaff00;">s</span><span style="color:#00ff00;">m</span><span style="color:#00ffaa;">a</span><span style="color:#00aaff;">l</span><span style="color:#0000ff;">o</span><span style="color:#aa00ff;">u</span><span style="color:#ff00aa;">s</span></span></span>`);
 		else
-			messagebox = messagebox.replaceAll("${name}", name);
-		messagebox = messagebox.replaceAll("${htmlBadges}", htmlBadges);
-		messagebox = messagebox.replaceAll("${msg}", msg);
+			messagebox = messagebox.replaceAll("${name}", twitchMsg.userstate["display-name"]);
+			messagebox = messagebox.replaceAll("${announce}", twitchMsg.userstate["message-type"]=="announcement" ? annouceBadge : "");
+			messagebox = messagebox.replaceAll("${htmlBadges}", htmlBadges);
+			messagebox = messagebox.replaceAll("${msg}", twitchMsg.message);
 
-		add(id, messagebox + "<br>");
+		add(twitchMsg.userstate.id, messagebox + "<br>");
 	}
 }
 
@@ -480,18 +479,81 @@ function delMsg(id) {
 async function testmsg() {
 	const dumyText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi. Proin porttitor, orci nec nonummy molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat. Duis semper. Duis arcu massa, scelerisque vitae, consequat in, pretium a, enim. Pellentesque congue. Ut in risus volutpat libero pharetra tempor. Cras vestibulum bibendum augue. Praesent egestas leo in pede. Praesent blandit odio eu enim. Pellentesque sed dui ut augue blandit sodales. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Aliquam nibh. Mauris ac mauris sed pede pellentesque fermentum. Maecenas adipiscing ante non diam sodales hendrerit.";
 
-	let dumybadges = {
-		"broadcaster": "1",
-		"subscriber": "12"
+	let testMsg = {
+		channel: "#syntax_err0r",
+		userstate: {
+		"badge-info": null,
+		"badges": {
+			"broadcaster": "1",
+			"subscriber": "12"
+			},
+		"color": null,
+		"display-name": dumyText.replace(" ", "").substring(0, 4 + Math.random() * 21),
+		"emotes": null,
+		"first-msg": false,
+		"flags": null,
+		"id": "6b526ea6-29bc-42b0-a235-0cc4aec6c36b",
+		"mod": false,
+		"returning-chatter": false,
+		"room-id": "237719570",
+		"subscriber": false,
+		"tmi-sent-ts": "1657319410322",
+		"turbo": false,
+		"user-id": Math.round(Math.random() * 1000),
+		"user-type": null,
+		"emotes-raw": "41:79-86",
+		"badge-info-raw": null,
+		"badges-raw": "vip/1",
+		"username": dumyText.replace(" ", "").substring(0, 4 + Math.random() * 21),
+		"message-type": "chat"
+	},
+	message: dumyText.substring(0, 1 + Math.random() * 50),
+	self: false
 	};
 
-	let name = new Object();
-	name.userId = dumyText.replace(" ", "").substring(0, 4 + Math.random() * 21);
-	name.color = null;
+	showMsg(testMsg);
 
-	let color = choose_user_color(name);
+	var t = setTimeout(() => { testmsg(); }, 100 + Math.random() * 15000);
+}
 
-	showMsg("", dumybadges, name.userId, color, dumyText.substring(0, Math.random() * 50));
-	if (testMode === 1)
-		var t = setTimeout(() => { testmsg(); }, 100 + Math.random() * 15000);
+async function testannounce() {
+
+	const dumyText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi. Proin porttitor, orci nec nonummy molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat. Duis semper. Duis arcu massa, scelerisque vitae, consequat in, pretium a, enim. Pellentesque congue. Ut in risus volutpat libero pharetra tempor. Cras vestibulum bibendum augue. Praesent egestas leo in pede. Praesent blandit odio eu enim. Pellentesque sed dui ut augue blandit sodales. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Aliquam nibh. Mauris ac mauris sed pede pellentesque fermentum. Maecenas adipiscing ante non diam sodales hendrerit.";
+
+	let testMsg = {
+		channel: "#syntax_err0r",
+		userstate: {
+			"badge-info": null,
+			"badges": {
+				"broadcaster": "1",
+				"subscriber": "12"
+				},
+			"color": null,
+			"display-name": dumyText.replace(" ", "").substring(0, 4 + Math.random() * 21),
+			"emotes": null,
+			"flags": null,
+			"id": "2588d8e5-bb11-43b3-adf3-e2213f149ce2",
+			"login": dumyText.replace(" ", "").substring(0, 4 + Math.random() * 21),
+			"mod": false,
+			"msg-id": "announcement",
+			"msg-param-color": "PRIMARY",
+			"room-id": "237719570",
+			"subscriber": true,
+			"system-msg": null,
+			"tmi-sent-ts": "1657319131524",
+			"user-id": Math.round(Math.random() * 1000),
+			"user-type": null,
+			"emotes-raw": null,
+			"badge-info-raw": "subscriber/27",
+			"badges-raw": "broadcaster/1,subscriber/12",
+			"message-type": "announcement"
+		},
+	message: dumyText.substring(0, 1 + Math.random() * 50),
+	self: false,
+	color: "PRIMARY"
+	};
+
+	showMsg(testMsg);
+
+	var t = setTimeout(() => { testannounce(); }, 100 + Math.random() * 15000);
 }
