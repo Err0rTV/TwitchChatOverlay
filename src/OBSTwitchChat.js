@@ -131,10 +131,10 @@ function start_chat(login,client_id) {
 		client.on('announcement', (channel, tags, message, self, color) => {
 
 			// filter bots
-			if(botmap.get(userstate["username"]))
+			if (botmap.get(tags["login"]))
 				return;
 
-				showMsg({channel: channel, userstate: tags, message: message, self: self, color: color});
+			showMsg({ channel: channel, userstate: tags, message: message, self: self, color: color });
 		});
 
 		client.on('message', (channel, userstate, message, self) => {
