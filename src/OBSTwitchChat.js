@@ -34,7 +34,7 @@ var bttv_emotes = new Map();
 async function start() {
 
 	messagesHideDelay = parseInt(getOption("messagesHideDelay"), 10) * 1000;
-	testMode = parseInt(getOption("testMode"));
+	testMode = parseInt(getOption("testMode"), 10);
 	token = getOption("token");
 
 	if (token) {
@@ -386,76 +386,93 @@ async function showMsg(twitchMsg) {
 		if (Object.keys(twitchMsg.userstate.badges).length > 0)
 			htmlBadges += `</span>`;
 	}
-	
-	// twitch emotes processing
-	if (twitchMsg.userstate.emotes != null) {
-		let map = new Array();
-		let map2 = new Array();
-		Object.entries(twitchMsg.userstate.emotes).forEach(([key, value]) => {
-			let emoteIMG = getEmoteImg(key);
+	const regex = /^https:\/\/www.twitch.tv\/.+\/clip\/.+$/gm;
+	if ((m = regex.exec(twitchMsg.message)) !== null) {
+		console.log(twitchMsg.message)
+		let response = await fetch(twitchMsg.message).catch((error)=>{ });
 
-
-			value.forEach(e => {
-				let s = e.split('-');
-				map.push({ start: parseInt(s[0]), end: parseInt(s[1]), emoteIMG: getEmoteImg(key) });
-			});
-		});
-
-		map.sort((firstEl, secondEl) => {
-			return secondEl.start - firstEl.start;
-		});
-
-		let end0 = twitchMsg.message.length - 1;
-
-		map.forEach((e) => {
-			if (end0 !== e.end) {
-				map2.unshift({ start: e.end + 1, end: end0, emoteIMG: escapeTag(twitchMsg.message.substring(e.end + 1, end0 + 1)) });
-			}
-			end0 = e.start - 1;
-		});
-
-		if (end0 >= 0) {
-			map2.unshift({ start: 0, end: end0, emoteIMG: escapeTag(twitchMsg.message.substring(0, end0 + 1)) });
+		if(response == undefined) {
+			console.log("can't fetch clip, launch obs with --disable-web-security parameter");
+			return;
 		}
-
-		map = map.concat(map2);
-
-		map.sort((firstEl, secondEl) => {
-			return firstEl.start - secondEl.start;
-		});
-
-		twitchMsg.message = "";
-		map.forEach((e) => {
-			twitchMsg.message += e.emoteIMG;
-		})
+		let data = await response.text();
+		let m = data.match(/<meta property="og:image" content="([^"]+)"\/>/m)
+		let url = m[1].replace("-social-preview.jpg", ".mp4")
+		console.log(url);
+		
+		twitchMsg.message = `<video width="100%" src="${url}" loop autoplay muted></video>`;
 	}
+
 	else {
-		twitchMsg.message = escapeTag(twitchMsg.message);
-	}
-
-	// bttv emotes processing
-	let regex = /([^.;, \n]+)/gm;
-	function f(correspondance, p1, decalage, chaine) {
-		// console.log("---------------");
-		// console.log(correspondance);
-		// console.log(p1);
-		// console.log(decalage);
-		// // console.log(chaine);
-		// console.log("---------------");
-
-		let img = bttv_emotes.get(correspondance);
+		// twitch emotes processing
+		if (twitchMsg.userstate.emotes != null) {
+			let map = new Array();
+			let map2 = new Array();
+			Object.entries(twitchMsg.userstate.emotes).forEach(([key, value]) => {
+				let emoteIMG = getEmoteImg(key);
 
 
-		if (img) {
-			img = `<img class="chatEmote" src="${img}">`;
-			return img;
+				value.forEach(e => {
+					let s = e.split('-');
+					map.push({ start: parseInt(s[0], 10), end: parseInt(s[1], 10), emoteIMG: getEmoteImg(key) });
+				});
+			});
+
+			map.sort((firstEl, secondEl) => {
+				return secondEl.start - firstEl.start;
+			});
+
+			let end0 = twitchMsg.message.length - 1;
+
+			map.forEach((e) => {
+				if (end0 !== e.end) {
+					map2.unshift({ start: e.end + 1, end: end0, emoteIMG: escapeTag(twitchMsg.message.substring(e.end + 1, end0 + 1)) });
+				}
+				end0 = e.start - 1;
+			});
+
+			if (end0 >= 0) {
+				map2.unshift({ start: 0, end: end0, emoteIMG: escapeTag(twitchMsg.message.substring(0, end0 + 1)) });
+			}
+
+			map = map.concat(map2);
+
+			map.sort((firstEl, secondEl) => {
+				return firstEl.start - secondEl.start;
+			});
+
+			twitchMsg.message = "";
+			map.forEach((e) => {
+				twitchMsg.message += e.emoteIMG;
+			})
 		}
-		else
-			return correspondance;
+		else {
+			twitchMsg.message = escapeTag(twitchMsg.message);
+		}
+
+		// bttv emotes processing
+		let regex = /([^.;, \n]+)/gm;
+		function f(correspondance, p1, decalage, chaine) {
+			// console.log("---------------");
+			// console.log(correspondance);
+			// console.log(p1);
+			// console.log(decalage);
+			// // console.log(chaine);
+			// console.log("---------------");
+
+			let img = bttv_emotes.get(correspondance);
+
+
+			if (img) {
+				img = `<img class="chatEmote" src="${img}">`;
+				return img;
+			}
+			else
+				return correspondance;
+		}
+
+		twitchMsg.message = twitchMsg.message.replace(regex, f);
 	}
-
-	twitchMsg.message = twitchMsg.message.replace(regex, f);
-
 
 	if (twitchMsg.userstate["message-type"] == "action")
 	twitchMsg.message = `<i>${twitchMsg.message}</i>`;
