@@ -1,5 +1,5 @@
 var token;
-var hideMessages;
+var messagesHideDelay;
 var testMode;
 var mergeMessage;
 var develop;
@@ -33,7 +33,7 @@ var bttv_emotes = new Map();
 
 async function start() {
 
-	hideMessages = parseInt(getOption("hideMessages"));
+	messagesHideDelay = parseInt(getOption("messagesHideDelay"), 10) * 1000;
 	testMode = parseInt(getOption("testMode"));
 	token = getOption("token");
 
@@ -319,7 +319,7 @@ function add(id, txt) {
 		li.className = "fade div show_noannim";
 	}
 
-	if (hideMessages === 1) {
+	if (messagesHideDelay) {
 		setTimeout(async () => {
 			if (document.visibilityState === "visible") {
 				li.className = "fade div hide";
@@ -332,7 +332,7 @@ function add(id, txt) {
 				// li.remove();
 			}
 			//                fade(li);
-		}, 15000);
+		}, messagesHideDelay);
 	}
 
 	// hide the message if it's top goes off view
