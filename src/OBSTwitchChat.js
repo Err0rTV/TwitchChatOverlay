@@ -124,7 +124,12 @@ function start_chat(login,client_id) {
 		});
 
 		client.on('announcement', (channel, tags, message, self, color) => {
-			showMsg({channel: channel, userstate: tags, message: message, self: self, color: color});
+
+			// filter bots
+			if(botmap.get(userstate["username"]))
+				return;
+
+				showMsg({channel: channel, userstate: tags, message: message, self: self, color: color});
 		});
 
 		client.on('message', (channel, userstate, message, self) => {
@@ -136,6 +141,7 @@ function start_chat(login,client_id) {
 			if(message.charAt(0) === "!")
 				return;
 
+			// filter bots
 			if(botmap.get(userstate["username"]))
 				return;
 
