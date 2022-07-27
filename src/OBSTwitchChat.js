@@ -21,7 +21,7 @@ function getOption(optionName)
 		optionValue = url.searchParams.get(optionName);
 	if(!optionValue)
 		optionValue = "";
-	return optionValue;
+	return optionValue.replaceAll(" ", "");
 }
 
 setTimeout( start, 500);
@@ -35,7 +35,7 @@ async function start() {
 
 	hideMessages = parseInt(getOption("hideMessages"));
 	testMode = parseInt(getOption("testMode"));
-	token = getOption("token").replaceAll(" ", "");
+	token = getOption("token");
 
 	if (token) {
 		if(token.startsWith("oauth:")) {
