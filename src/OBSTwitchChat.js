@@ -484,7 +484,7 @@ async function showMsg(twitchMsg) {
 
 	if (messagebox != null) {
 		messagebox = messagebox.replaceAll("${nameColor}", twitchMsg.userstate.color ? twitchMsg.userstate.color : choose_user_color(twitchMsg.userstate["user-id"]));
-		if(name == "lesmalous")
+		if (twitchMsg.userstate["user-id"] == "741565995")
 			messagebox = messagebox.replaceAll("${name}", `	<span class="block-line"><span><span style="color:#ff0000;">l</span><span style="color:#ffaa00;">e</span><span style="color:#aaff00;">s</span><span style="color:#00ff00;">m</span><span style="color:#00ffaa;">a</span><span style="color:#00aaff;">l</span><span style="color:#0000ff;">o</span><span style="color:#aa00ff;">u</span><span style="color:#ff00aa;">s</span></span></span>`);
 		else
 			messagebox = messagebox.replaceAll("${name}", twitchMsg.userstate["display-name"]);
