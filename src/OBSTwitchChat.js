@@ -360,6 +360,53 @@ function fade(li) {
 		})
 }
 
+async function fetchClipUrl(message) {
+	const regex = [
+		/^https:\/\/www.twitch.tv\/.+\/clip\/(.+)$/gm,
+		/^https:\/\/clips.twitch.tv\/(.+)$/gm
+	]
+
+	message = message.replace('http://', 'https://')
+	message = message.replace(/\?.*/, '')
+
+	let slug = ''
+
+	regex.forEach(element => {
+		m = element.exec(message)
+		if (m != null) {
+			slug = m[1]
+		}
+	});
+
+	if (slug != '') {
+		let url
+		console.log(message)
+
+		for (let c = 1; c <= 3; c++) {
+			let response = await fetch(`https://clips.twitch.tv/${slug}`).catch((error) => { });
+
+			if (response == undefined) {
+				console.log("can't fetch clip, launch obs with --disable-web-security parameter");
+				return null;
+			}
+
+			let data = await response.text();
+
+			let m = data.match(/(<[^"]+property="og:image".*?\/>)/m)
+
+			if (m != null) {
+				m = m[1].match(/content="(.*)"/)
+				url = m[1].replace("-social-preview.jpg", ".mp4") //BUG: regex not match
+				console.log(url)
+				return url
+			}
+			console.log("retry " + c)
+			await new Promise((r) => setTimeout(r, 2000));
+		}
+	}
+	return null
+}
+
 async function showMsg(twitchMsg) {
 	//<tr><td style='white-space: nowrap; vertical-align:top;'>";
 	// console.log("visibilityState: " + document.visibilityState);
@@ -387,23 +434,11 @@ async function showMsg(twitchMsg) {
 		if (Object.keys(twitchMsg.userstate.badges).length > 0)
 			htmlBadges += `</span>`;
 	}
-	const regex = /^https:\/\/www.twitch.tv\/.+\/clip\/.+$/gm;
-	if ((m = regex.exec(twitchMsg.message)) !== null) {
-		console.log(twitchMsg.message)
-		let response = await fetch(twitchMsg.message).catch((error)=>{ });
 
-		if(response == undefined) {
-			console.log("can't fetch clip, launch obs with --disable-web-security parameter");
-			return;
-		}
-		let data = await response.text();
-		let m = data.match(/<meta property="og:image" content="([^"]+)"\/>/m)
-		let url = m[1].replace("-social-preview.jpg", ".mp4")
-		console.log(url);
-		
+	let url = await fetchClipUrl(twitchMsg.message)
+	if (url != null) {
 		twitchMsg.message = `<video width="100%" src="${url}" loop autoplay muted></video>`;
 	}
-
 	else {
 		// twitch emotes processing
 		if (twitchMsg.userstate.emotes != null) {
