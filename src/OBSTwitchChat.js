@@ -86,14 +86,15 @@ function start_chat(login,client_id) {
 		botmap.set(e[0], true);
 
 	});
-	
-	customBot.forEach((e)=>{
-		botmap.set(e, true);
-	});
+	if (typeof customBot != 'undefined')
+		customBot.forEach((e) => {
+			botmap.set(e, true);
+		});
 
-	whiteListBot.forEach((e)=>{
-		botmap.delete(e);
-	});
+	if (typeof whiteListBot != 'undefined')
+		whiteListBot.forEach((e) => {
+			botmap.delete(e);
+		});
 
 	if (token != "") {
 		const client = new tmi.Client({
