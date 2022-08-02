@@ -392,7 +392,7 @@ async function fetchClipUrl(message) {
 
 			let data = await response.text();
 
-			let m = data.match(/(<[^"]+property="og:image".*?\/>)/m)
+			let m = data.match(/.*(<meta.*?property="og:image".*?\/>)/m)
 
 			if (m != null) {
 				m = m[1].match(/content="(.*)"/)
