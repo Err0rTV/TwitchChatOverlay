@@ -3,7 +3,7 @@
 # You can adjust the behavior by modifying this file.
 # For more information, see:
 # https://github.com/actions/stale
-name: Mark stale issues and pull requests
+name: Check for code formating
 
 on:
   push:
@@ -12,7 +12,7 @@ on:
       - dev-actions-1
 
 jobs:
-  build:
+  check_formating:
 
     runs-on: ubuntu-latest
 
