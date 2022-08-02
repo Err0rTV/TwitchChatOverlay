@@ -9,8 +9,8 @@ on:
   push:
     branches:
       - development
-      - feat-template
-      
+      - dev-actions-1
+
 jobs:
   build:
 
