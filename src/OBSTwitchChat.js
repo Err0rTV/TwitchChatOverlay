@@ -392,7 +392,7 @@ async function fetchClipUrl(message) {
 			let m = data.match(/.*(<meta.*?property="og:image".*?\/>)/m)
 
 			if (m != null) {
-				m = m[1].match(/content="(.*)"/)
+				m = m[1].match(/content="(.*?)"/)
 				url = m[1].replace("-social-preview.jpg", ".mp4") //BUG: regex not match
 				console.log(url)
 				return url
