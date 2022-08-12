@@ -1,6 +1,6 @@
 # This workflow test the code.
 
-name: Check for code formating
+name: Code testing
 
 on:
   push:
