@@ -96,7 +96,8 @@ function start_chat(login,client_id) {
 	if (token != "") {
 		const client = new tmi.Client({
 			options: { debug: true, 
-				messagesLogLevel: "info",
+				// messagesLogLevel: "info",
+				debug: false,
 				clientId: client_id
 			},
 			connection: {
@@ -117,7 +118,7 @@ function start_chat(login,client_id) {
 		});
 
 		client.on('clearchat', (channel) => {
-			console.log("chat clear");
+			// console.log("chat clear");
 			let ul = document.getElementById('test');
 			ul.innerHTML = '<div style="height: 200vw;"></div>';
 		});
@@ -219,14 +220,14 @@ function getBTTVGlobalEmotes() {
 function getBTTVChannelEmotes(user_id) {
 	return fetch(`https://api.betterttv.net/3/cached/users/twitch/${user_id}`)
 		.then(response => {
-			console.log(response.status);
+			// console.log(response.status);
 			if(response.status == 200)
 				return response.json()
 			else
 				return {channelEmotes: Array(), sharedEmotes: Array()};
 		})
 		.then(data => {
-			console.log(data);
+			// console.log(data);
 			data.channelEmotes.forEach(e => {
 				bttv_emotes.set(e.code, `https://cdn.betterttv.net/emote/${e.id}/3x`);
 			});
@@ -377,7 +378,7 @@ async function fetchClipUrl(message) {
 
 	if (slug != '') {
 		let url
-		console.log(message)
+		// console.log(message)
 
 		for (let c = 1; c <= 3; c++) {
 			let response = await fetch(`https://clips.twitch.tv/${slug}`).catch((error) => { });
@@ -394,7 +395,7 @@ async function fetchClipUrl(message) {
 			if (m != null) {
 				m = m[1].match(/content="(.*)"/)
 				url = m[1].replace("-social-preview.jpg", ".mp4") //BUG: regex not match
-				console.log(url)
+				// console.log(url)
 				return url
 			}
 			console.log("retry " + c)
