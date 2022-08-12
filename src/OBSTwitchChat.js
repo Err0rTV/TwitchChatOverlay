@@ -7,10 +7,7 @@ var develop;
 const annouceBadge = document.getElementById("announceBadge").innerHTML;
 
 document.body.innerHTML += `<div class="chat" id="chat" style="overflow: hidden; scroll-behavior: smooth;height: 100%; width: 100%; ">
-<div id="test" class="fade" style="height: 100%; width: 100%;">
-	<div style="height: 200vw;"></div>
-</div>
-</div>`;
+<div id="test" class="fade" style="width: 100%; bottom: 0px; position: absolute;"></div></div>`;
 
 function getOption(optionName)
 {

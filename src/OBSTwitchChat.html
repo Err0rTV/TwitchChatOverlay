@@ -55,18 +55,25 @@
         vertical-align: middle;
     }
 
+    .fade {
+        height: 0px;
+    }
+
     .fade div.hidden {
         transition: all 1.0s ease-out;
         opacity: 0;
+        height: auto;
     }
 
     .fade div.show {
         opacity: 1;
+        height: auto;
         transition: all 1.0s ease-out;
     }
 
     .fade div.hide {
         opacity: 0.0;
+        height: auto;
         transition: all 1.0s ease-out;
     }
 
