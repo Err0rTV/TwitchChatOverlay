@@ -322,12 +322,12 @@ function add(id, txt) {
 			if (document.visibilityState === "visible") {
 				li.className = "fade div hide";
 				setTimeout(async () => {
-					// li.remove();
+					li.remove();
 				}, 2000);
 			}
 			else {
 				li.className = "fade div hide_noannim";
-				// li.remove();
+				li.remove();
 			}
 			//                fade(li);
 		}, messagesHideDelay);
