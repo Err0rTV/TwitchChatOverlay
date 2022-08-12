@@ -9,7 +9,7 @@ on:
       - dev-actions-1
 
 jobs:
-  check_formating:
+  testing:
 
     runs-on: ubuntu-latest
 
