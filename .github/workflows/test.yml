@@ -20,4 +20,6 @@ jobs:
         with:
           node-version: 16
       - run: npm ci
-      - run: npm run test
+      - env:
+          TWITCH_TOKEN: ${{ secrets.TWITCH_TOKEN }}
+        run: npm run test
