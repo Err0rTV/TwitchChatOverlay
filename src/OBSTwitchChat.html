@@ -1,117 +1,128 @@
 <!DOCTYPE html>
 <html>
+	<head> </head>
+	<style>
+		::-webkit-scrollbar {
+			display: none;
+		}
 
-<head>
-</head>
-<style>
-    ::-webkit-scrollbar {
-        display: none;
-    }
+		body {
+			padding: 0px;
+			margin: 0px;
+			background-color: rgba(0, 0, 0, 0);
+			overflow: hidden;
+		}
 
-    body {
-        padding: 0px;
-        margin: 0px;
-        background-color: rgba(0, 0, 0, 0);
-        overflow: hidden;
-    }
+		.chat {
+			position: absolute;
+			width: 100%;
+		}
 
-    .chat {
-        position: absolute;
-        width: 100%;
-    }
+		.chatMsgContener {
+			background: rgba(77, 77, 77, 0.4);
+			padding: 5px;
+			margin-left: 10px;
+		}
 
-    .chatMsgContener {
-        background: rgba(77, 77, 77, 0.4);
-        padding: 5px;
-        margin-left: 10px;
-    }
+		.charMsgText {
+			font-size: 36px;
+			font-family: 'Arial', cursive;
+			text-align: left;
+			color: white;
+			margin-right: 10px;
+			margin-left: 0px;
+			display: inline;
+		}
 
-    .charMsgText {
-        font-size: 36px;
-        font-family: 'Arial', cursive;
-        text-align: left;
-        color: white;
-        margin-right: 10px;
-        margin-left: 0px;
-        display: inline;
-    }
+		.chatBadge {
+			height: 28px;
+			margin-left: 5px;
+			margin-right: 0px;
+			display: inline;
+		}
 
-    .chatBadge {
-        height: 28px;
-        margin-left: 5px;
-        margin-right: 0px;
-        display: inline;
-    }
+		.chatBadge:first-of-type {
+			margin-left: 0px;
+			margin-right: 0px;
+		}
 
-    .chatBadge:first-of-type {
-        margin-left: 0px;
-        margin-right: 0px;
-    }
+		.chatEmote {
+			height: 36px;
+			opacity: 1;
+			margin-right: 5px;
+			vertical-align: middle;
+		}
 
-    .chatEmote {
-        height: 36px;
-        opacity: 1;
-        margin-right: 5px;
-        vertical-align: middle;
-    }
+		.fade {
+			height: 0px;
+		}
 
-    .fade {
-        height: 0px;
-    }
+		.fade div.hidden {
+			transition: all 1s ease-out;
+			opacity: 0;
+			height: auto;
+		}
 
-    .fade div.hidden {
-        transition: all 1.0s ease-out;
-        opacity: 0;
-        height: auto;
-    }
+		.fade div.show {
+			opacity: 1;
+			height: auto;
+			transition: all 1s ease-out;
+		}
 
-    .fade div.show {
-        opacity: 1;
-        height: auto;
-        transition: all 1.0s ease-out;
-    }
+		.fade div.hide {
+			opacity: 0;
+			height: auto;
+			transition: all 1s ease-out;
+		}
 
-    .fade div.hide {
-        opacity: 0.0;
-        height: auto;
-        transition: all 1.0s ease-out;
-    }
+		.fade div.show_noannim {
+			opacity: 1;
+			transition: all 0s ease 0s;
+			height: auto;
+		}
 
-    .fade div.show_noannim {
-        opacity: 1;
-        transition: all 0s ease 0s;
-        height: auto;
-    }
+		.fade div.hide_noannim {
+			opacity: 0;
+			transition: all 0s ease 0s;
+			height: auto;
+		}
+	</style>
 
-    .fade div.hide_noannim {
-        opacity: 0;
-        transition: all 0s ease 0s;
-        height: auto;
-    }
-</style>
+	<body>
+		<template id="announceBadge"
+			><figure class="chatBadge">
+				<svg
+					type="color-fill-current"
+					version="1.1"
+					viewBox="0 0 20 20"
+					x="0px"
+					y="0px"
+					class="chatBadge"
+				>
+					<path
+						fill-rule="evenodd"
+						clip-rule="evenodd"
+						d="M11 14l7 4V2l-7 4H4a2 2 0 00-2 2v4a2 2 0 002 2h2v4h2v-4h3zm1-6.268l4-2.286v9.108l-4-2.286V7.732zM10 12H4V8h6v4z"
+					></path>
+				</svg></figure
+		></template>
 
-<body>
-    <template id=announceBadge><figure class="chatBadge"><svg type="color-fill-current" version="1.1" viewBox="0 0 20 20" x="0px" y="0px" class="chatBadge"><path fill-rule="evenodd" clip-rule="evenodd" d="M11 14l7 4V2l-7 4H4a2 2 0 00-2 2v4a2 2 0 002 2h2v4h2v-4h3zm1-6.268l4-2.286v9.108l-4-2.286V7.732zM10 12H4V8h6v4z"></path></svg></figure></template>
+		<template id="messagebox-template">
+			<div class="chatMsgContener">
+				<div class="charMsgText" style="color:${nameColor};">
+					<strong>${announce}${name}</strong> ${htmlBadges}
+				</div>
+				<div class="charMsgText">${msg}</div>
+			</div>
+		</template>
 
-    <template id="messagebox-template">
-        <div class='chatMsgContener'>
-            <div class='charMsgText' style='color:${nameColor};'><strong>${announce}${name}</strong>
-                ${htmlBadges}</div>
-            <div class='charMsgText'>${msg}</div>
-        </div>
-    </template>
-
-    <!-- get token <a href="https://twitchapps.com/tmi/">here</a> -->
-
-</body>
-<script>
-    customBot = [
-        "syntax_terr0r"
-    ];
-    whiteListBot = []
-</script>
-<script src="botlist.js"></script>
-<script src="tmi.js"></script>
-<script src="OBSTwitchChat.js"></script>
-
+		<!-- get token <a href="https://twitchapps.com/tmi/">here</a> -->
+	</body>
+	<script>
+		customBot = ['syntax_terr0r']
+		whiteListBot = []
+	</script>
+	<script src="botlist.js"></script>
+	<script src="tmi.js"></script>
+	<script src="OBSTwitchChat.js"></script>
 </html>
