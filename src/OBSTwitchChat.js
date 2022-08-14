@@ -389,13 +389,18 @@ async function fetchClipUrl(message) {
 
 			let data = await response.text();
 
-			let m = data.match(/.*(<meta.*?property="og:image".*?\/>)/m)
+			let position = String(data).indexOf('property="og:image"')
+			if (position != -1) {
+				let start = String(data).lastIndexOf('<meta', position)
+				let end = String(data).indexOf('>', position)
+				let m = String(data).substring(start, end + 1)
 
-			if (m != null) {
-				m = m[1].match(/content="(.*?)"/)
-				url = m[1].replace("-social-preview.jpg", ".mp4") //BUG: regex not match
-				console.log(url)
-				return url
+				m = m.match(/content="(.*?)"/)
+				if (m) {
+					url = m[1].replace("-social-preview.jpg", ".mp4")
+					console.log(url)
+					return url
+				}
 			}
 			console.log("retry " + c)
 			await new Promise((r) => setTimeout(r, 2000));
