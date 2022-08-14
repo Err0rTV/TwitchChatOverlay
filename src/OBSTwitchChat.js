@@ -3,6 +3,7 @@ var messagesHideDelay;
 var testMode;
 var mergeMessage;
 var develop;
+var isTokenValid;
 
 const annouceBadge = document.getElementById("announceBadge").innerHTML;
 
@@ -41,7 +42,7 @@ async function start() {
 		}
 		else
 		{
-			console.error("token should start with \"oauth:\"");
+			console.log("token should start with \"oauth:\"");
 			token = "";
 		}
 	}
@@ -55,9 +56,10 @@ async function start() {
 	if (token != "" && token != null) {
 		const { user_id, login, client_id, status } = await getUserInfos(token);
 		if (status != 200) {
-			console.error("invalid token, please provide a valid token");
+			console.log("invalid token, please provide a valid token");
 		}
 		else {
+			isTokenValid = true
 			channel_badge_sets = await getChannelBadges(user_id);
 			getBTTVChannelEmotes(user_id);
 			getFFChannelEmotes(user_id);
@@ -170,7 +172,7 @@ function getUserInfos(token) {
 			return data;
 		})
 		.catch((error)=>{
-			console.error(error);
+			// console.log(error);
 		})
 }
 
@@ -550,10 +552,6 @@ async function testmsg() {
 		channel: "#syntax_err0r",
 		userstate: {
 		"badge-info": null,
-		"badges": {
-			"broadcaster": "1",
-			"subscriber": "12"
-			},
 		"color": null,
 		"display-name": dumyText.replace(" ", "").substring(0, 4 + Math.random() * 21),
 		"emotes": null,
@@ -578,6 +576,15 @@ async function testmsg() {
 	self: false
 	};
 
+	if(isTokenValid) {
+		testMsg.userstate = {
+			"badges": {
+				"broadcaster": "1",
+				"subscriber": "12"
+			}
+		}
+	}
+
 	showMsg(testMsg);
 
 	var t = setTimeout(() => { testmsg(); }, 100 + Math.random() * 15000);
@@ -591,10 +598,6 @@ async function testannounce() {
 		channel: "#syntax_err0r",
 		userstate: {
 			"badge-info": null,
-			"badges": {
-				"broadcaster": "1",
-				"subscriber": "12"
-				},
 			"color": null,
 			"display-name": dumyText.replace(" ", "").substring(0, 4 + Math.random() * 21),
 			"emotes": null,
@@ -615,10 +618,19 @@ async function testannounce() {
 			"badges-raw": "broadcaster/1,subscriber/12",
 			"message-type": "announcement"
 		},
-	message: dumyText.substring(0, 1 + Math.random() * 50),
-	self: false,
-	color: "PRIMARY"
+		message: dumyText.substring(0, 1 + Math.random() * 50),
+		self: false,
+		color: "PRIMARY"
 	};
+
+	if (isTokenValid) {
+		testMsg.userstate = {
+			"badges": {
+				"broadcaster": "1",
+				"subscriber": "12"
+			}
+		}
+	}
 
 	showMsg(testMsg);
 

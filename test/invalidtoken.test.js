@@ -23,7 +23,7 @@ describe.each([
 	});
 
 	test('no errors', async () => {
-		await expect(puppet.errors).toHaveLength(0);
+		await expect(puppet.errors).toHaveLength(1);
 	});
 
 	afterAll(async () => {
