@@ -378,7 +378,7 @@ async function fetchClipUrl(message) {
 
 	if (slug != '') {
 		let url
-		// console.log(message)
+		// // console.log(message)
 
 		for (let c = 1; c <= 3; c++) {
 			let response = await fetch(`https://clips.twitch.tv/${slug}`).catch((error) => { });
@@ -399,7 +399,7 @@ async function fetchClipUrl(message) {
 				m = m.match(/content="(.*?)"/)
 				if (m) {
 					url = m[1].replace("-social-preview.jpg", ".mp4")
-					console.log(url)
+					// console.log(url)
 					return url
 				}
 			}
