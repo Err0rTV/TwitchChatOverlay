@@ -594,11 +594,9 @@ async function testmsg() {
 	}
 
 	if (isTokenValid) {
-		testMsg.userstate = {
-			badges: {
-				broadcaster: '1',
-				subscriber: '12',
-			},
+		testMsg.userstate.badges = {
+			broadcaster: '1',
+			subscriber: '12',
 		}
 	}
 
@@ -645,11 +643,9 @@ async function testannounce() {
 	}
 
 	if (isTokenValid) {
-		testMsg.userstate = {
-			badges: {
-				broadcaster: '1',
-				subscriber: '12',
-			},
+		testMsg.userstate.badges = {
+			broadcaster: '1',
+			subscriber: '12',
 		}
 	}
 
