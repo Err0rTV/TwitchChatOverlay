@@ -2,8 +2,16 @@ cpuppeteer = require('./cpuppeteer.js')
 
 // let exp = ['please provide a valid token']
 describe.each([
-	['--chatbox-testMode: 1;', `--chatbox-token: ${process.env.TWITCH_TOKEN};`, []],
-	['--chatbox-testMode: 2;', `--chatbox-token: ${process.env.TWITCH_TOKEN};`, []],
+	[
+		'--chatbox-testMode: 1;',
+		`--chatbox-token: ${process.env.TWITCH_TOKEN};`,
+		[],
+	],
+	[
+		'--chatbox-testMode: 2;',
+		`--chatbox-token: ${process.env.TWITCH_TOKEN};`,
+		[],
+	],
 ])('', (testMode, token, expected) => {
 	var puppet
 	beforeAll(async () => {
