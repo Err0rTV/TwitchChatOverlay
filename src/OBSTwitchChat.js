@@ -176,21 +176,25 @@ function getUserInfos(token) {
 }
 
 function getChannelBadges() {
-	return fetch(`https://api.twitch.tv/helix/chat/badges?broadcaster_id=${gUserId}`, {
-		headers: new Headers({
-			Authorization: 'Bearer ' + token.split(':')[1],
-			"Client-Id": gClientId
-		}),
-	}).then((response) => {
-		// status = response.status
-		return response.json()
-	})
+	return fetch(
+		`https://api.twitch.tv/helix/chat/badges?broadcaster_id=${gUserId}`,
+		{
+			headers: new Headers({
+				Authorization: 'Bearer ' + token.split(':')[1],
+				'Client-Id': gClientId,
+			}),
+		}
+	)
+		.then((response) => {
+			// status = response.status
+			return response.json()
+		})
 		.then((data) => {
 			// data.status = status
 			// console.log(data)
 			let outArray = {}
 			for (let e of data.data) {
-				outArray[e.set_id] = { "versions": e.versions }
+				outArray[e.set_id] = { versions: e.versions }
 			}
 			// console.log(outArray)
 			return outArray
@@ -204,21 +208,23 @@ function getGlobalBadges() {
 	return fetch(`https://api.twitch.tv/helix/chat/badges/global`, {
 		headers: new Headers({
 			Authorization: 'Bearer ' + token.split(':')[1],
-			"Client-Id": gClientId
+			'Client-Id': gClientId,
 		}),
-	}).then((response) => {
-		// status = response.status
-		return response.json()
-	}).then((data) => {
-		// data.status = status
-		// console.log(data)
-		let outArray = {}
-		for (let e of data.data) {
-			outArray[e.set_id] = { "versions": e.versions }
-		}
-		// console.log(outArray)
-		return outArray
 	})
+		.then((response) => {
+			// status = response.status
+			return response.json()
+		})
+		.then((data) => {
+			// data.status = status
+			// console.log(data)
+			let outArray = {}
+			for (let e of data.data) {
+				outArray[e.set_id] = { versions: e.versions }
+			}
+			// console.log(outArray)
+			return outArray
+		})
 		.catch((error) => {
 			// console.log(error);
 		})
@@ -461,15 +467,17 @@ async function showMsg(twitchMsg) {
 			// console.log(key + " : " + value)
 			if (channel_badge_sets[key] != null) {
 				let badge = channel_badge_sets[key]
-				let version = badge.versions.filter(e => e.id === value)[0]
-				if (version != undefined)
-					badgeImg = version.image_url_4x
+				let version = badge.versions.filter((e) => e.id === value)[0]
+				if (version != undefined) badgeImg = version.image_url_4x
 				else {
-
-					badgeImg = glogal_badge_sets[key].versions.filter(e => e.id === value)[0].image_url_4x
+					badgeImg = glogal_badge_sets[key].versions.filter(
+						(e) => e.id === value
+					)[0].image_url_4x
 				}
 			} else {
-				badgeImg = glogal_badge_sets[key]?.versions.filter(e => e.id === value)[0].image_url_4x
+				badgeImg = glogal_badge_sets[key]?.versions.filter(
+					(e) => e.id === value
+				)[0].image_url_4x
 			}
 
 			htmlBadges += `<img class='chatBadge' src='${badgeImg}'>`
