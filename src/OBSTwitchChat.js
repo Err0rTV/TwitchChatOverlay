@@ -4,6 +4,8 @@ var testMode
 var mergeMessage
 var develop
 var isTokenValid
+var gClientId
+var gUserId
 
 const annouceBadge = document.getElementById('announceBadge').innerHTML
 
@@ -45,14 +47,16 @@ async function start() {
 	getFFGlobalEmotes()
 	getBTTVGlobalEmotes()
 
-	glogal_badge_sets = await getGlobalBadges()
 	if (token != '' && token != null) {
 		const { user_id, login, client_id, status } = await getUserInfos(token)
 		if (status != 200) {
 			console.log('invalid token, please provide a valid token')
 		} else {
+			gClientId = client_id
+			gUserId = user_id
 			isTokenValid = true
-			channel_badge_sets = await getChannelBadges(user_id)
+			glogal_badge_sets = await getGlobalBadges()
+			channel_badge_sets = await getChannelBadges()
 			getBTTVChannelEmotes(user_id)
 			getFFChannelEmotes(user_id)
 			start_chat(login, client_id)
@@ -171,19 +175,52 @@ function getUserInfos(token) {
 		})
 }
 
-function getChannelBadges(user_id) {
-	return fetch(`https://badges.twitch.tv/v1/badges/channels/${user_id}/display`)
-		.then((response) => response.json())
+function getChannelBadges() {
+	return fetch(`https://api.twitch.tv/helix/chat/badges?broadcaster_id=${gUserId}`, {
+		headers: new Headers({
+			Authorization: 'Bearer ' + token.split(':')[1],
+			"Client-Id": gClientId
+		}),
+	}).then((response) => {
+		// status = response.status
+		return response.json()
+	})
 		.then((data) => {
-			return data.badge_sets
+			// data.status = status
+			// console.log(data)
+			let outArray = {}
+			for (let e of data.data) {
+				outArray[e.set_id] = { "versions": e.versions }
+			}
+			// console.log(outArray)
+			return outArray
+		})
+		.catch((error) => {
+			// console.log(error);
 		})
 }
 
 function getGlobalBadges() {
-	return fetch('https://badges.twitch.tv/v1/badges/global/display')
-		.then((response) => response.json())
-		.then((data) => {
-			return data.badge_sets
+	return fetch(`https://api.twitch.tv/helix/chat/badges/global`, {
+		headers: new Headers({
+			Authorization: 'Bearer ' + token.split(':')[1],
+			"Client-Id": gClientId
+		}),
+	}).then((response) => {
+		// status = response.status
+		return response.json()
+	}).then((data) => {
+		// data.status = status
+		// console.log(data)
+		let outArray = {}
+		for (let e of data.data) {
+			outArray[e.set_id] = { "versions": e.versions }
+		}
+		// console.log(outArray)
+		return outArray
+	})
+		.catch((error) => {
+			// console.log(error);
 		})
 }
 
@@ -420,13 +457,22 @@ async function showMsg(twitchMsg) {
 
 		Object.entries(twitchMsg.userstate.badges).forEach(([key, value]) => {
 			let badge
+			let badgeImg
+			// console.log(key + " : " + value)
 			if (channel_badge_sets[key] != null) {
-				if (channel_badge_sets[key].versions[value] != undefined)
-					badge = channel_badge_sets[key].versions[value].image_url_4x
-				else badge = glogal_badge_sets[key].versions[value].image_url_4x
-			} else badge = glogal_badge_sets[key]?.versions[value].image_url_4x
+				let badge = channel_badge_sets[key]
+				let version = badge.versions.filter(e => e.id === value)[0]
+				if (version != undefined)
+					badgeImg = version.image_url_4x
+				else {
 
-			htmlBadges += `<img class='chatBadge' src='${badge}'>`
+					badgeImg = glogal_badge_sets[key].versions.filter(e => e.id === value)[0].image_url_4x
+				}
+			} else {
+				badgeImg = glogal_badge_sets[key]?.versions.filter(e => e.id === value)[0].image_url_4x
+			}
+
+			htmlBadges += `<img class='chatBadge' src='${badgeImg}'>`
 		})
 
 		if (Object.keys(twitchMsg.userstate.badges).length > 0)
