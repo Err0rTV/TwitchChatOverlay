@@ -46,6 +46,9 @@ async function start() {
 	} else token = localStorage.getItem('twitchChatToken')
 
 	let fetchPromises = []
+	fetchPromises.push(getFFGlobalEmotes())
+	fetchPromises.push(getBTTVGlobalEmotes())
+	fetchPromises.push(get7tvGlobalEmotes())
 
 	if (token != '' && token != null) {
 		const { user_id, login, client_id, status } = await getUserInfos(token)
@@ -59,7 +62,12 @@ async function start() {
 			channel_badge_sets = await getChannelBadges()
 			fetchPromises.push(getTwitchGlobalEmotes())
 			fetchPromises.push(getTwitchChannelEmotes())
-			await Promise.all(fetchPromises).then(() => { console.log("start_chat"); start_chat(login, client_id) })
+			fetchPromises.push(getBTTVChannelEmotes(user_id))
+			fetchPromises.push(getFFChannelEmotes(user_id))
+			fetchPromises.push(get7tvChannelEmotes(user_id))
+			await Promise.all(fetchPromises).then(() => {
+				start_chat(login, client_id)
+			})
 		}
 	} else console.log('please provide a valid token')
 
@@ -231,59 +239,88 @@ function getGlobalBadges() {
 }
 
 function getFFGlobalEmotes() {
-	return fetch('https://api.betterttv.net/3/cached/frankerfacez/emotes/global')
-		.then((response) => response.json())
-		.then((data) => {
-			data.forEach((e) => {
-				let img
-				if (e.images['4x'] != null) img = e.images['4x']
-				else if (e.images['2x'] != null) img = e.images['2x']
-				else if (e.images['1x'] != null) img = e.images['1x']
+	let promise = new Promise((resolve, reject) => {
+		fetch('https://api.betterttv.net/3/cached/frankerfacez/emotes/global')
+			.then((response) => response.json())
+			.then((data) => {
+				data.forEach((e) => {
+					let img
+					if (e.images['4x'] != null) img = e.images['4x']
+					else if (e.images['2x'] != null) img = e.images['2x']
+					else if (e.images['1x'] != null) img = e.images['1x']
 
-				bttv_emotes.set(e.code, img)
+					bttv_emotes.set(e.code, img)
+				})
 			})
-		})
+			.finally(() => {
+				resolve()
+			})
+	})
+	return promise
 }
 
 function getBTTVGlobalEmotes() {
-	return fetch('https://api.betterttv.net/3/cached/emotes/global')
-		.then((response) => response.json())
-		.then((data) => {
-			data.forEach((e) => {
-				bttv_emotes.set(e.code, `https://cdn.betterttv.net/emote/${e.id}/3x`)
+	let promise = new Promise((resolve, reject) => {
+		fetch('https://api.betterttv.net/3/cached/emotes/global')
+			.then((response) => response.json())
+			.then((data) => {
+				data.forEach((e) => {
+					bttv_emotes.set(e.code, `https://cdn.betterttv.net/emote/${e.id}/3x`)
+				})
 			})
-		})
+			.finally(() => {
+				resolve()
+			})
+	})
+	return promise
 }
 
 function getBTTVChannelEmotes(user_id) {
-	return fetch(`https://api.betterttv.net/3/cached/users/twitch/${user_id}`)
-		.then((response) => {
-			// console.log(response.status);
-			if (response.status == 200) return response.json()
-			else return { channelEmotes: Array(), sharedEmotes: Array() }
-		})
-		.then((data) => {
-			// console.log(data);
-			data.channelEmotes.forEach((e) => {
-				bttv_emotes.set(e.code, `https://cdn.betterttv.net/emote/${e.id}/3x`)
+	let promise = new Promise((resolve, reject) => {
+		fetch(`https://api.betterttv.net/3/cached/users/twitch/${user_id}`)
+			.then((response) => {
+				// console.log(response.status);
+				if (response.status == 200) return response.json()
+				else return { channelEmotes: Array(), sharedEmotes: Array() }
 			})
-			data.sharedEmotes.forEach((e) => {
-				bttv_emotes.set(e.code, `https://cdn.betterttv.net/emote/${e.id}/3x`)
+			.then((data) => {
+				// console.log(data);
+				data.channelEmotes.forEach((e) => {
+					bttv_emotes.set(e.code, `https://cdn.betterttv.net/emote/${e.id}/3x`)
+				})
+				data.sharedEmotes.forEach((e) => {
+					bttv_emotes.set(e.code, `https://cdn.betterttv.net/emote/${e.id}/3x`)
+				})
 			})
-		})
+			.finally(() => {
+				resolve()
+			})
+	})
+	return promise
 }
 
 function getFFChannelEmotes(user_id) {
-	return fetch(
-		`https://api.betterttv.net/3/cached/frankerfacez/users/twitch/${user_id}`
-	)
-		.then((response) => response.json())
-		.then((data) => {
-			data.forEach((e) => {
-				let img
-				if (e.images['4x'] != null) img = e.images['4x']
-				else if (e.images['2x'] != null) img = e.images['2x']
-				else if (e.images['1x'] != null) img = e.images['1x']
+	let promise = new Promise((resolve, reject) => {
+		fetch(
+			`https://api.betterttv.net/3/cached/frankerfacez/users/twitch/${user_id}`
+		)
+			.then((response) => response.json())
+			.then((data) => {
+				data.forEach((e) => {
+					let img
+					if (e.images['4x'] != null) img = e.images['4x']
+					else if (e.images['2x'] != null) img = e.images['2x']
+					else if (e.images['1x'] != null) img = e.images['1x']
+
+					bttv_emotes.set(e.code, `${img}`)
+				})
+			})
+			.finally(() => {
+				resolve()
+			})
+	})
+	return promise
+}
 
 function getTwitchGlobalEmotes() {
 	let promise = new Promise((resolve, reject) => {
@@ -343,6 +380,54 @@ function getTwitchChannelEmotes() {
 	return promise
 }
 
+function get7tvGlobalEmotes() {
+	let promise = new Promise((resolve, reject) => {
+		fetch('https://7tv.io/v3/emote-sets/global')
+			.then((response) => response.json())
+			.then((data) => {
+				// console.log(data)
+				data.emotes.forEach((e) => {
+					bttv_emotes.set(
+						e.name,
+						'https:' +
+							e.data.host.url +
+							'/' +
+							e.data.host.files
+								.filter((value, index) => value.name === '4x.webp')
+								.at(0).name
+					)
+				})
+				// console.log(bttv_emotes)
+			})
+			.finally(() => {
+				resolve()
+			})
+	})
+	return promise
+}
+function get7tvChannelEmotes(user_id) {
+	let promise = new Promise((resolve, reject) => {
+		fetch(`https://7tv.io/v3/users/twitch/101481308`)
+			.then((response) => response.json())
+			.then((data) => {
+				data.emote_set.emotes.forEach((e) => {
+					bttv_emotes.set(
+						e.name,
+						'https:' +
+							e.data.host.url +
+							'/' +
+							e.data.host.files
+								.filter((value, index) => value.name === '4x.webp')
+								.at(0).name
+					)
+				})
+				console.log(bttv_emotes)
+			})
+			.finally(() => {
+				resolve()
+			})
+	})
+	return promise
 }
 
 function getEmoteImg(emoteId) {
