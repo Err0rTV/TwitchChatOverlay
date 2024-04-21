@@ -199,12 +199,10 @@ function getChannelBadges() {
 		})
 		.then((data) => {
 			// data.status = status
-			// console.log(data)
 			let outArray = {}
 			for (let e of data.data) {
 				outArray[e.set_id] = { versions: e.versions }
 			}
-			// console.log(outArray)
 			return outArray
 		})
 		.catch((error) => {
@@ -225,12 +223,10 @@ function getGlobalBadges() {
 		})
 		.then((data) => {
 			// data.status = status
-			// console.log(data)
 			let outArray = {}
 			for (let e of data.data) {
 				outArray[e.set_id] = { versions: e.versions }
 			}
-			// console.log(outArray)
 			return outArray
 		})
 		.catch((error) => {
@@ -284,7 +280,6 @@ function getBTTVChannelEmotes(user_id) {
 				else return { channelEmotes: Array(), sharedEmotes: Array() }
 			})
 			.then((data) => {
-				// console.log(data);
 				data.channelEmotes.forEach((e) => {
 					bttv_emotes.set(e.code, `https://cdn.betterttv.net/emote/${e.id}/3x`)
 				})
@@ -336,7 +331,6 @@ function getTwitchGlobalEmotes() {
 			})
 			.then((data) => {
 				// data.status = status
-				// console.log(data)
 				for (let e of data.data) {
 					twtich_emotes.set(e.id, e)
 				}
@@ -368,7 +362,6 @@ function getTwitchChannelEmotes() {
 				for (let e of data.data) {
 					twtich_emotes.set(e.id, e)
 				}
-				// console.log(twtich_emotes)
 			})
 			.catch((error) => {
 				// console.log(error);
@@ -385,7 +378,6 @@ function get7tvGlobalEmotes() {
 		fetch('https://7tv.io/v3/emote-sets/global')
 			.then((response) => response.json())
 			.then((data) => {
-				// console.log(data)
 				data.emotes.forEach((e) => {
 					bttv_emotes.set(
 						e.name,
@@ -397,7 +389,6 @@ function get7tvGlobalEmotes() {
 								.at(0).name
 					)
 				})
-				// console.log(bttv_emotes)
 			})
 			.finally(() => {
 				resolve()
@@ -421,7 +412,6 @@ function get7tvChannelEmotes(user_id) {
 								.at(0).name
 					)
 				})
-				console.log(bttv_emotes)
 			})
 			.finally(() => {
 				resolve()
