@@ -29,6 +29,7 @@ var glogal_badge_sets = new Object()
 var channel_badge_sets = new Object()
 
 var bttv_emotes = new Map()
+var twtich_emotes = new Map()
 
 async function start() {
 	messagesHideDelay = parseInt(getOption('messagesHideDelay'), 10) * 1000
@@ -44,8 +45,7 @@ async function start() {
 		}
 	} else token = localStorage.getItem('twitchChatToken')
 
-	getFFGlobalEmotes()
-	getBTTVGlobalEmotes()
+	let fetchPromises = []
 
 	if (token != '' && token != null) {
 		const { user_id, login, client_id, status } = await getUserInfos(token)
@@ -57,9 +57,9 @@ async function start() {
 			isTokenValid = true
 			glogal_badge_sets = await getGlobalBadges()
 			channel_badge_sets = await getChannelBadges()
-			getBTTVChannelEmotes(user_id)
-			getFFChannelEmotes(user_id)
-			start_chat(login, client_id)
+			fetchPromises.push(getTwitchGlobalEmotes())
+			fetchPromises.push(getTwitchChannelEmotes())
+			await Promise.all(fetchPromises).then(() => { console.log("start_chat"); start_chat(login, client_id) })
 		}
 	} else console.log('please provide a valid token')
 
@@ -285,9 +285,64 @@ function getFFChannelEmotes(user_id) {
 				else if (e.images['2x'] != null) img = e.images['2x']
 				else if (e.images['1x'] != null) img = e.images['1x']
 
-				bttv_emotes.set(e.code, `${img}`)
-			})
+function getTwitchGlobalEmotes() {
+	let promise = new Promise((resolve, reject) => {
+		fetch(`https://api.twitch.tv/helix/chat/emotes/global`, {
+			headers: new Headers({
+				Authorization: 'Bearer ' + token.split(':')[1],
+				'Client-Id': gClientId,
+			}),
 		})
+			.then((response) => {
+				// status = response.status
+				return response.json()
+			})
+			.then((data) => {
+				// data.status = status
+				// console.log(data)
+				for (let e of data.data) {
+					twtich_emotes.set(e.id, e)
+				}
+			})
+			.catch((error) => {
+				// console.log(error);
+			})
+			.finally(() => {
+				resolve()
+			})
+	})
+	return promise
+}
+
+function getTwitchChannelEmotes() {
+	let promise = new Promise((resolve, reject) => {
+		fetch(`https://api.twitch.tv/helix/chat/emotes?broadcaster_id=${gUserId}`, {
+			headers: new Headers({
+				Authorization: 'Bearer ' + token.split(':')[1],
+				'Client-Id': gClientId,
+			}),
+		})
+			.then((response) => {
+				// status = response.status
+				return response.json()
+			})
+			.then((data) => {
+				// data.status = status
+				for (let e of data.data) {
+					twtich_emotes.set(e.id, e)
+				}
+				// console.log(twtich_emotes)
+			})
+			.catch((error) => {
+				// console.log(error);
+			})
+			.finally(() => {
+				resolve()
+			})
+	})
+	return promise
+}
+
 }
 
 function getEmoteImg(emoteId) {
