@@ -86,6 +86,9 @@ async function start() {
 			updateChannelEmotes(user_id).then(() => {
 				start_chat(login, client_id)
 
+				if (testMode == 1) testmsg()
+				if (testMode == 2) testannounce()
+
 				socket = new WebSocket('wss://sockets.betterttv.net/ws')
 				socket.onmessage = (event) => {
 					let data = JSON.parse(event.data)
@@ -142,9 +145,6 @@ async function start() {
 			})
 		}
 	} else console.log('please provide a valid token')
-
-	if (testMode == 1) testmsg()
-	if (testMode == 2) testannounce()
 }
 
 function escapeTag(txt) {
