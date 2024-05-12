@@ -55,7 +55,6 @@ function updateChannelEmotes(user_id) {
 			})
 
 			bttv_emotes = lEmotes
-			console.log(bttv_emotes)
 			resolve()
 		})
 	})
@@ -89,7 +88,6 @@ async function start() {
 
 				socket = new WebSocket('wss://sockets.betterttv.net/ws')
 				socket.onmessage = (event) => {
-					console.log(event)
 					let data = JSON.parse(event.data)
 					if (
 						data.name == 'emote_update' ||
@@ -109,10 +107,10 @@ async function start() {
 					)
 				}
 				socket.onerror = (e) => {
-					console.log(e)
+//					console.log(e)
 				}
 				socket.onclose = (e) => {
-					console.log(e)
+//					console.log(e)
 				}
 
 				if (SevenTV_emotes_set_id) {
@@ -120,22 +118,22 @@ async function start() {
 						`https://events.7tv.io/v3@emote_set.update%3Cobject_id=${SevenTV_emotes_set_id}%3E`
 					)
 					evtSource.onmessage = function (e) {
-						console.log('message')
-						console.log(e)
+//						console.log('message')
+//						console.log(e)
 					}
 					evtSource.onerror = (e) => {
-						console.log(e)
+//						console.log(e)
 					}
 					evtSource.onopen = (e) => {
-						console.log(e)
+//						console.log(e)
 					}
 					evtSource.addEventListener('heartbeat', (event) => {
 						// console.log("notice")
 						// console.log(event)
 					})
 					evtSource.addEventListener('dispatch', (event) => {
-						console.log('emote_set.update')
-						console.log(event)
+//						console.log('emote_set.update')
+//						console.log(event)
 
 						let data = JSON.parse(event.data)
 						if (data.type == 'emote_set.update') updateChannelEmotes(gUserId)
