@@ -398,7 +398,7 @@ function get7tvGlobalEmotes() {
 }
 function get7tvChannelEmotes(user_id) {
 	let promise = new Promise((resolve, reject) => {
-		fetch(`https://7tv.io/v3/users/twitch/101481308`)
+		fetch(`https://7tv.io/v3/users/twitch/${user_id}`)
 			.then((response) => response.json())
 			.then((data) => {
 				data.emote_set.emotes.forEach((e) => {
