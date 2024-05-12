@@ -29,7 +29,7 @@ var glogal_badge_sets = new Object()
 var channel_badge_sets = new Object()
 
 var bttv_emotes = new Map()
-var twtich_emotes = new Map()
+
 
 async function start() {
 	messagesHideDelay = parseInt(getOption('messagesHideDelay'), 10) * 1000
@@ -311,63 +311,7 @@ function getFFChannelEmotes(user_id) {
 				})
 			})
 			.finally(() => {
-				resolve()
-			})
-	})
-	return promise
-}
-
-function getTwitchGlobalEmotes() {
-	let promise = new Promise((resolve, reject) => {
-		fetch(`https://api.twitch.tv/helix/chat/emotes/global`, {
-			headers: new Headers({
-				Authorization: 'Bearer ' + token.split(':')[1],
-				'Client-Id': gClientId,
-			}),
-		})
-			.then((response) => {
-				// status = response.status
-				return response.json()
-			})
-			.then((data) => {
-				// data.status = status
-				for (let e of data.data) {
-					twtich_emotes.set(e.id, e)
-				}
-			})
-			.catch((error) => {
-				// console.log(error);
-			})
-			.finally(() => {
-				resolve()
-			})
-	})
-	return promise
-}
-
-function getTwitchChannelEmotes() {
-	let promise = new Promise((resolve, reject) => {
-		fetch(`https://api.twitch.tv/helix/chat/emotes?broadcaster_id=${gUserId}`, {
-			headers: new Headers({
-				Authorization: 'Bearer ' + token.split(':')[1],
-				'Client-Id': gClientId,
-			}),
-		})
-			.then((response) => {
-				// status = response.status
-				return response.json()
-			})
-			.then((data) => {
-				// data.status = status
-				for (let e of data.data) {
-					twtich_emotes.set(e.id, e)
-				}
-			})
-			.catch((error) => {
-				// console.log(error);
-			})
-			.finally(() => {
-				resolve()
+				resolve(lEmotes)
 			})
 	})
 	return promise
