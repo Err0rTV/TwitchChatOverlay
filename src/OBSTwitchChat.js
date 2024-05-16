@@ -203,7 +203,7 @@ function fade(li) {
 		})
 }
 
-async function fetchClipUrl(message) {
+export async function fetchClipUrl(message) {
 	const regex = [
 		/^https:\/\/www.twitch.tv\/.+\/clip\/(.+)$/gm,
 		/^https:\/\/clips.twitch.tv\/(.+)$/gm,

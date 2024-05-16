@@ -9,7 +9,8 @@
   "scripts": {
     "test": "jest --verbose test/*",
     "prettier": "prettier --check src test",
-    "webpack": "webpack"
+    "webpack": "webpack",
+    "webpack_test": "webpack --config ./webpack.dev.config.cjs"
   },
   "dependencies": {
     "reconnecting-eventsource": "^1.6.2",

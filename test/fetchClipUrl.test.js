@@ -34,7 +34,7 @@ describe.each([
 		output = await puppet.page.evaluate(
 			new Function(
 				'url',
-				'return new Promise(resolve => {resolve(fetchClipUrl(url))});'
+				'return new Promise(resolve => {resolve(test_lib.fetchClipUrl(url))});'
 			),
 			url
 		)
