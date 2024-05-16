@@ -9,6 +9,9 @@
   "scripts": {
     "test": "jest --verbose test/*",
     "prettier": "prettier --check src test"
+  },
+  "dependencies": {
+    "reconnecting-eventsource": "^1.6.2",
+    "webpack-cli": "^5.1.4"
   }
-  
 }
