@@ -18,7 +18,6 @@ var messagesHideDelay
 var testMode
 var mergeMessage
 
-
 const annouceBadge = document.getElementById('announceBadge').innerHTML
 
 document.body.innerHTML += `<div class="chat" id="chat" style="overflow: hidden; scroll-behavior: smooth;height: 100%; width: 100%; ">
