@@ -2,3 +2,4 @@ TODO
 build/
 node_modules
 coverage
+dist
