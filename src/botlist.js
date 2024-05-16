@@ -1,5 +1,5 @@
 // dump from https://api.twitchinsights.net/v1/bots/all
-var botlist = {
+export var twitch_botlist = {
 	bots: [
 		['slocool', 26012, 1565348543],
 		['commanderroot', 78339, 1658956653],

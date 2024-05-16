@@ -1,3 +1,6 @@
+import { twitch_botlist } from './botlist.js'
+import { Client } from 'tmi.js'
+
 var glogal_badge_sets = new Object()
 var channel_badge_sets = new Object()
 
@@ -116,7 +119,7 @@ export async function getGlobalBadges(user_id) {
 
 export function start_chat(login, client_id) {
 	var botmap = new Map()
-	botlist.bots.forEach((e) => {
+	twitch_botlist.bots.forEach((e) => {
 		botmap.set(e[0], true)
 	})
 	if (typeof customBot != 'undefined')
@@ -130,7 +133,7 @@ export function start_chat(login, client_id) {
 		})
 
 	if (token != '') {
-		const client = new tmi.Client({
+		const client = new Client({
 			options: {
 				debug: true,
 				// messagesLogLevel: "info",

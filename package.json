@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "reconnecting-eventsource": "^1.6.2",
+    "tmi.js": "github:Err0rTV/tmi.js",
     "webpack-cli": "^5.1.4"
   }
 }
