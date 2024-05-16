@@ -3,7 +3,7 @@ module.exports = {
 	mode: 'development',
 	devtool: "source-map",
 	output: {
-		filename: 'dist/OBSTwitchChat.js',
-		sourceMapFilename: 'dist/OBSTwitchChat.js.map'
+		filename: 'OBSTwitchChat.js',
+		sourceMapFilename: 'OBSTwitchChat.js.map'
 	},
 };
