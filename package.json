@@ -8,7 +8,8 @@
   },
   "scripts": {
     "test": "jest --verbose test/*",
-    "prettier": "prettier --check src test"
+    "prettier": "prettier --check src test",
+    "webpack": "webpack"
   },
   "dependencies": {
     "reconnecting-eventsource": "^1.6.2",

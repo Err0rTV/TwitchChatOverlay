@@ -18,6 +18,8 @@ export var twitchUserInfo = {
 	status: '',
 }
 
+var develop
+
 // export function setToken(_var) {
 // 	token = _var
 // }

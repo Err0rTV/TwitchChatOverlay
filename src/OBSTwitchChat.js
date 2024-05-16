@@ -17,7 +17,7 @@ import { init7TV, get7TVEmoteImg } from './seventv.js'
 var messagesHideDelay
 var testMode
 var mergeMessage
-var develop
+
 
 const annouceBadge = document.getElementById('announceBadge').innerHTML
 

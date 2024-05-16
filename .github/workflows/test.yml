@@ -21,6 +21,8 @@ jobs:
         with:
           node-version: 16
       - run: npm ci
+      - run: npm run webpack
+      - run: cp src/OBSTwitchChat.html dist/OBSTwitchChat.html
       - env:
           TWITCH_TOKEN: ${{ secrets.TWITCH_TOKEN }}
         run: npm run test

@@ -93,7 +93,6 @@ export function getBTTVChannelEmotes(user_id) {
 			})
 			.finally(() => {
 				channel_emotes = lEmotes
-				console.log(channel_emotes)
 				resolve()
 			})
 	})

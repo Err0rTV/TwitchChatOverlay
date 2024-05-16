@@ -23,7 +23,7 @@ describe.each([
 	beforeAll(async () => {
 		puppet = new cpuppeteer()
 		await puppet.init(['--disable-web-security'])
-		await puppet.goto('../src/OBSTwitchChat.html')
+		await puppet.goto('../dist/OBSTwitchChat.html')
 		await puppet.page.addStyleTag({
 			content: `
 				.chat {
