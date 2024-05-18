@@ -23,6 +23,18 @@ const annouceBadge = document.getElementById('announceBadge').innerHTML
 document.body.innerHTML += `<div class="chat" id="chat" style="overflow: hidden; scroll-behavior: smooth;height: 100%; width: 100%; ">
 <div id="test" class="fade" style="width: 100%; bottom: 0px; position: absolute;"></div></div>`
 
+/**
+ * @brief Retrieves the value of a specified chatbox option.
+ *
+ * This function fetches the value of a chatbox-related option. It first tries to get
+ * the value from the computed styles of the chat element. If not found, it checks
+ * the URL search parameters. If the value is not found in either place, an empty 
+ * string is returned. All spaces in the final value are removed before returning it.
+ *
+ * @param[in] optionName The name of the chatbox option to retrieve.
+ * @return The value of the specified chatbox option with all spaces removed. 
+ * If the option is not found, an empty string is returned.
+ */
 function getOption(optionName) {
 	let url = new URL(document.URL)
 	let chatElement = document.getElementById('chat')
@@ -118,6 +130,16 @@ function subStringReplace(string, replaceString, start, end) {
 
 var user_color = new Map()
 
+/**
+ * @brief Chooses a unique color for a user based on their user ID.
+ *
+ * This function assigns a unique color to a user if one hasn't been assigned already.
+ * It generates a random RGB color with certain constraints to ensure it's not too
+ * grey or too dark. The color is then stored and reused for the given user ID.
+ *
+ * @param[in] userId The unique identifier of the user.
+ * @return The RGB color string assigned to the user.
+ */
 function choose_user_color(userId) {
 	let color = user_color.get(userId)
 	if (color === undefined) {
@@ -146,6 +168,17 @@ function choose_user_color(userId) {
 	return color
 }
 
+/**
+ * @brief Adds a message element to the chat and handles its display and removal.
+ *
+ * This function creates a new chat message element, appends it to the chat container,
+ * and handles its display, scrolling behavior, and timed removal based on the 
+ * visibility state of the document. If the `messagesHideDelay` is set, the message 
+ * will be removed after the specified delay.
+ *
+ * @param[in] id The unique identifier for the message element.
+ * @param[in] txt The HTML content of the message to be displayed.
+ */
 function add(id, txt) {
 	var ul = document.getElementById('test')
 	var chatDiv = document.getElementById('chat')
@@ -210,6 +243,16 @@ function fade(li) {
 		})
 }
 
+/**
+ * @brief Fetches the URL of a Twitch clip from a given message.
+ *
+ * This asynchronous function extracts a clip slug from a Twitch URL within the 
+ * provided message, then attempts to fetch the corresponding clip URL up to three times.
+ * If the clip URL is found, it is returned; otherwise, the function returns null.
+ *
+ * @param[in] message The message containing the Twitch clip URL.
+ * @return A promise that resolves to the URL of the Twitch clip in MP4 format, or null if not found.
+ */
 export async function fetchClipUrl(message) {
 	const regex = [
 		/^https:\/\/www.twitch.tv\/.+\/clip\/(.+)$/gm,
@@ -266,6 +309,40 @@ export async function fetchClipUrl(message) {
 	return null
 }
 
+/**
+ * @brief Processes and displays a Twitch message with badges, emotes, and clips.
+ *
+ * This asynchronous function takes a Twitch message object, processes its badges, emotes,
+ * and clip URLs, and then constructs an HTML representation of the message. The message 
+ * is then displayed in the chat window.
+ *
+ * @param twitchMsg The Twitch message object containing user state and message text.
+ * @param twitchMsg.channel The channel where the message was sent.
+ * @param twitchMsg.userstate An object containing user state information and message metadata.
+ * @param twitchMsg.userstate.badge-info Additional information about the user's badges.
+ * @param twitchMsg.userstate.color The color of the user's name in chat. (#177DE3)
+ * @param twitchMsg.userstate.display-name The display name of the user.
+ * @param twitchMsg.userstate.emotes An object containing information about the emotes in the message ({ '499': [ '3-4' ] }),
+ *                       where the key is the emote ID and the value is an array of ranges.
+ * @param twitchMsg.userstate.first-msg Indicates if this is the user's first message in the chat.
+ * @param twitchMsg.userstate.flags Any flags associated with the message.
+ * @param twitchMsg.userstate.id A unique identifier for the message. (c5ddcb05-85ae-4a60-91bc-7704c7031257)
+ * @param twitchMsg.userstate.mod Indicates if the user is a moderator.
+ * @param twitchMsg.userstate.returning-chatter Indicates if the user is a returning chatter.
+ * @param twitchMsg.userstate.room-id The unique identifier for the chat room.
+ * @param twitchMsg.userstate.subscriber Indicates if the user is a subscriber.
+ * @param twitchMsg.userstate.tmi-sent-ts The timestamp when the message was sent.
+ * @param twitchMsg.userstate.turbo Indicates if the user has Turbo.
+ * @param twitchMsg.userstate.user-id The unique identifier for the user.
+ * @param twitchMsg.userstate.user-type The type of user (mod, global mod, admin, or staff).
+ * @param twitchMsg.userstate.emotes-raw The raw emote data.
+ * @param twitchMsg.userstate.badge-info-raw The raw badge info data.
+ * @param twitchMsg.userstate.badges-raw The raw badges data.
+ * @param twitchMsg.userstate.username The username of the user.
+ * @param twitchMsg.userstate.message-type The type of message (chat, whisper, action, announcement, etc.).
+ * @param twitchMsg.message The content of the message.
+ * @param twitchMsg.self Indicates if the message was sent by the user themselves.
+ */
 async function showMsg(twitchMsg) {
 	//<tr><td style='white-space: nowrap; vertical-align:top;'>";
 	// console.log("visibilityState: " + document.visibilityState);
