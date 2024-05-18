@@ -13,6 +13,7 @@
     "webpack_test": "webpack --config ./webpack.dev.config.cjs"
   },
   "dependencies": {
+    "dotenv": "^16.4.5",
     "reconnecting-eventsource": "^1.6.2",
     "tmi.js": "github:Err0rTV/tmi.js",
     "webpack-cli": "^5.1.4"
