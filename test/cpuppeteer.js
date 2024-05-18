@@ -1,3 +1,4 @@
+require('dotenv').config()
 const puppeteer = require('puppeteer')
 path = require('path')
 const { blue, cyan, green, magenta, red, yellow } = require('colorette')

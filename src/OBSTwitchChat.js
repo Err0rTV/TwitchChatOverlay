@@ -36,9 +36,17 @@ function getOption(optionName) {
 
 setTimeout(start, 500)
 
+function toInt(str, _default, err_str) {
+	let v = parseInt(str, 10)
+	if (Number.isInteger(v))
+		return v
+	else if (str !== '')
+		console.log(err_str)
+	return _default
+}
 async function start() {
-	messagesHideDelay = parseInt(getOption('messagesHideDelay'), 10) * 1000
-	testMode = parseInt(getOption('testMode'), 10)
+	messagesHideDelay = toInt(getOption('messagesHideDelay'), 10, "messagesHideDelay should be an unsigned integer") * 1000
+	testMode = toInt(getOption('testMode'), 0, "testMode maybe 0, 1 or 2")
 
 	initTwitch(getOption('token')).then((success) => {
 		if (success) {
