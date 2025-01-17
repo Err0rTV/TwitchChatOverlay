@@ -1,3 +1,4 @@
+// development, production
 module.exports = {
 	entry: './src/OBSTwitchChat.js',
 	mode: 'development',

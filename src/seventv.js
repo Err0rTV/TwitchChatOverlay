@@ -9,6 +9,8 @@ var SevenTV_emotes_set_id
 var channel_emotes = new Map()
 var global_emotes = new Map()
 
+var updateCount = 0
+
 export function get7TVEmoteImg(id) {
 	let e = channel_emotes.get(id)
 	if (!e) e = global_emotes.get(id)
@@ -45,10 +47,14 @@ export function init7TV() {
 
 					let data = JSON.parse(event.data)
 					if (data.type == 'emote_set.update') {
+						updateCount++
 						setTimeout(() => {
-							get7TVGlobalEmotes()
-							get7TVChannelEmotes(twitchUserInfo.user_id)
-						}, 1000)
+							if (updateCount == 1) {
+								get7TVGlobalEmotes()
+								get7TVChannelEmotes(twitchUserInfo.user_id)
+							}
+							updateCount--
+						}, 5000)
 					}
 				})
 			}

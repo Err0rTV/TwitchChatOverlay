@@ -90,8 +90,8 @@
 	</style>
 
 	<body>
-		<template id="announceBadge"
-			><figure class="chatBadge">
+		<template id="announceBadge">
+			<figure class="chatBadge">
 				<svg
 					type="color-fill-current"
 					version="1.1"
@@ -105,23 +105,27 @@
 						clip-rule="evenodd"
 						d="M11 14l7 4V2l-7 4H4a2 2 0 00-2 2v4a2 2 0 002 2h2v4h2v-4h3zm1-6.268l4-2.286v9.108l-4-2.286V7.732zM10 12H4V8h6v4z"
 					></path>
-				</svg></figure
-		></template>
+				</svg>
+			</figure>
+		</template>
 
 		<template id="messagebox-template">
-			<div class="chatMsgContener">
-				<div class="charMsgText" style="color:${nameColor};">
-					<strong>${announce}${name}</strong> ${htmlBadges}
+			<div name="contener" class="chatMsgContener">
+				<div class="charMsgText text">
+					<strong
+						><span class="announce"></span><span class="name"></span
+					></strong>
+					<span class="htmlBadges"></span>
 				</div>
-				<div class="charMsgText">${msg}</div>
+				<div class="charMsgText msg"></div>
 			</div>
 		</template>
 
 		<!-- get token <a href="https://twitchapps.com/tmi/">here</a> -->
+		<script>
+			customBot = ['syntax_terr0r']
+			whiteListBot = []
+		</script>
+		<script src="OBSTwitchChat.js"></script>
 	</body>
-	<script>
-		customBot = ['syntax_terr0r']
-		whiteListBot = []
-	</script>
-	<script src="OBSTwitchChat.js"></script>
 </html>
