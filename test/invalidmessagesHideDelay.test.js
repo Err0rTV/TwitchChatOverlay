@@ -6,17 +6,17 @@ describe.each([
 		[
 			'--chatbox-testMode: 1;',
 			'--chatbox-messagesHideDelay: aaa;',
-			`--chatbox-token: ${process.env.TWITCH_TOKEN};`
+			`--chatbox-token: ${process.env.TWITCH_TOKEN};`,
 		],
-		["messagesHideDelay should be an unsigned integer"],
+		['messagesHideDelay should be an unsigned integer'],
 	],
 	[
 		[
 			'--chatbox-testMode: 2;',
 			'--chatbox-messagesHideDelay: a;',
-			`--chatbox-token: ${process.env.TWITCH_TOKEN};`
+			`--chatbox-token: ${process.env.TWITCH_TOKEN};`,
 		],
-		["messagesHideDelay should be an unsigned integer"],
+		['messagesHideDelay should be an unsigned integer'],
 	],
 ])('', (param, expected) => {
 	var puppet
@@ -27,7 +27,7 @@ describe.each([
 		await puppet.page.addStyleTag({
 			content: `
 				.chat {
-				  ${param.join(" ")}
+				  ${param.join(' ')}
 			  }`,
 		})
 		await new Promise((r) => setTimeout(r, 5000))

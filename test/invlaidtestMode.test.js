@@ -5,12 +5,12 @@ describe.each([
 	[
 		'--chatbox-testMode: a;',
 		`--chatbox-token: ${process.env.TWITCH_TOKEN};`,
-		["testMode maybe 0, 1 or 2"],
+		['testMode maybe 0, 1 or 2'],
 	],
 	[
 		'--chatbox-testMode: aaa;',
 		`--chatbox-token: ${process.env.TWITCH_TOKEN};`,
-		["testMode maybe 0, 1 or 2"],
+		['testMode maybe 0, 1 or 2'],
 	],
 ])('', (testMode, token, expected) => {
 	var puppet
