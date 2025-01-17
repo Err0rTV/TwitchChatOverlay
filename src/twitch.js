@@ -423,11 +423,13 @@ async function showMsg(twitchMsg) {
 
 		for (let e of tokens2) {
 			if (twitchMsg.userstate.emotes != null)
-				for (let emote of Object.entries(twitchMsg.userstate.emotes)) {
-					if (emote[1] == e.start + '-' + e.end) {
-						e.type = 'emote'
-						e.img = `https://static-cdn.jtvnw.net/emoticons/v2/${emote[0]}/default/dark/3.0`
-						break
+				for (let emotes of Object.entries(twitchMsg.userstate.emotes)) {
+					for (let emote of emotes[1]) {
+						if (emote == e.start + '-' + e.end) {
+							e.type = 'emote'
+							e.img = `https://static-cdn.jtvnw.net/emoticons/v2/${emotes[0]}/default/dark/3.0`
+							break
+						}
 					}
 				}
 			if (Object.hasOwn(e, 'type')) continue
