@@ -1,0 +1,26 @@
+{
+	"msgs": [
+		{
+			"channel": "syntax_terr0r",
+			"message": "xxx LUL xxx",
+			"userstate": {
+				"badges": null,
+				"color": null,
+				"display-name": "Syntax_Terr0r",
+				"emotes": {
+					"425618": ["4-6"]
+				},
+				"message-id": "10",
+				"thread-id": "237719570_633955343",
+				"turbo": false,
+				"user-id": "633955343",
+				"user-type": null,
+				"emotes-raw": "425618:4-6",
+				"badges-raw": null,
+				"username": "syntax_terr0r",
+				"message-type": "whisper"
+			},
+			"self": false
+		}
+	]
+}
