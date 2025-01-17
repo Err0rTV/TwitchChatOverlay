@@ -363,7 +363,6 @@ async function testannounce() {
  * @param twitchMsg.self Indicates if the message was sent by the user themselves.
  */
 async function showMsg(twitchMsg) {
-
 	let htmlBadges = document.createElement('span')
 	let message = document.createElement('span')
 
