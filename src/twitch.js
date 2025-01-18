@@ -274,9 +274,12 @@ async function testmsg() {
 
 	showMsg(testMsg)
 
-	var t = setTimeout(() => {
-		testmsg()
-	}, 100 + Math.random() * 15000)
+	var t = setTimeout(
+		() => {
+			testmsg()
+		},
+		100 + Math.random() * 15000
+	)
 }
 
 async function testannounce() {
@@ -323,9 +326,12 @@ async function testannounce() {
 
 	showMsg(testMsg)
 
-	var t = setTimeout(() => {
-		testannounce()
-	}, 100 + Math.random() * 15000)
+	var t = setTimeout(
+		() => {
+			testannounce()
+		},
+		100 + Math.random() * 15000
+	)
 }
 
 /**
