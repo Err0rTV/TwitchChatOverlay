@@ -21,22 +21,7 @@ jobs:
         with:
           node-version: 23
 
-      - run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            libnss3 \
-            libx11-xcb1 \
-            libxcomposite1 \
-            libxrandr2 \
-            libgbm1 \
-            wget \
-            curl \
-            ca-certificates \
-            fonts-liberation \
-            libappindicator3-1 \
-            libasound2 \
-            libnspr4
-
+      - run: echo "PUPPETEER_SKIP_SANDBOX=true" >> $GITHUB_ENV
 
       - run: npm ci
       - run: npm run webpack_test
