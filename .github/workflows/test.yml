@@ -25,12 +25,18 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y \
             libnss3 \
-            libgconf-2-4 \
             libx11-xcb1 \
             libxcomposite1 \
             libxrandr2 \
             libgbm1 \
-          wget
+            wget \
+            curl \
+            ca-certificates \
+            fonts-liberation \
+            libappindicator3-1 \
+            libasound2 \
+            libnspr4
+
 
       - run: npm ci
       - run: npm run webpack_test
