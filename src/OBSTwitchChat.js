@@ -11,6 +11,9 @@ import { initBTTV } from './betterttv.js'
 import { initFF } from './frankerzface.js'
 import { init7TV } from './seventv.js'
 
+// export for testing
+export {fetchClipUrl} from './twitch.js'
+
 var messagesHideDelay
 var mergeMessage
 
@@ -22,6 +25,7 @@ setTimeout(start, 1000)
 // document.addEventListener('DOMContentLoaded', (event) => {
 // 	start()
 // })
+
 
 async function start() {
 	messagesHideDelay =
