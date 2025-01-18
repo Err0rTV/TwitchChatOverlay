@@ -17,10 +17,11 @@ var mergeMessage
 document.body.innerHTML += `<div class="chat" id="chat" style="overflow: hidden; scroll-behavior: smooth;height: 100%; width: 100%; ">
 <div id="test" class="fade" style="width: 100%; bottom: 0px; position: absolute;"></div></div>`
 
-// setTimeout(start, 500)
-document.addEventListener('DOMContentLoaded', (event) => {
-	start()
-})
+// don't replace by addEventListener('DOMContentLoaded'), OBS needs time to parse
+setTimeout(start, 1000)
+// document.addEventListener('DOMContentLoaded', (event) => {
+// 	start()
+// })
 
 async function start() {
 	messagesHideDelay =
