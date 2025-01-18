@@ -8,7 +8,7 @@ describe.each([
 	var puppet
 	beforeAll(async () => {
 		puppet = new cpuppeteer()
-		await puppet.init('--no-sandbox')
+		await puppet.init(['--no-sandbox'])
 		await puppet.goto('../dist/OBSTwitchChat.html')
 		await puppet.page.addStyleTag({
 			content: `
