@@ -22,7 +22,7 @@ describe.each([
 	var output
 	beforeAll(async () => {
 		puppet = new cpuppeteer()
-		await puppet.init(['--disable-web-security'])
+		await puppet.init(['--disable-web-security', '--no-sandbox'])
 		await puppet.goto('../dist/OBSTwitchChat.html')
 		await puppet.page.addStyleTag({
 			content: `
