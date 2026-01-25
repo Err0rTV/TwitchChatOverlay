@@ -44,37 +44,31 @@ export function subStringReplace(string, replaceString, start, end) {
 var user_color = new Map()
 
 /**
- * @brief Chooses a unique color for a user based on their user ID.
+ * @brief Generates a deterministic color for a user based on their numeric ID.
  *
- * This function assigns a unique color to a user if one hasn't been assigned already.
- * It generates a random RGB color with certain constraints to ensure it's not too
- * grey or too dark. The color is then stored and reused for the given user ID.
+ * This function derives a hue from the userId using the Golden Angle approximation.
+ * This ensures that even dispersed or sequential IDs (like Twitch UIDs) receive 
+ * visually distinct colors without clustering.
+ * * Saturation and Lightness are fixed (100%, 50%) to guarantee visibility 
+ * and prevent grey or dark colors.
  *
- * @param[in] userId The unique identifier of the user.
- * @return The RGB color string assigned to the user.
+ * @param[in] userId The numeric identifier of the user.
+ * @return The CSS HSL color string (e.g., "hsl(120, 100%, 50%)").
  */
 export function choose_user_color(userId) {
 	let color = user_color.get(userId)
+
 	if (color === undefined) {
-		const threshold = 25
-		const offset = 50
-		let r = Math.round(Math.random() * 200 + 25)
-		let g = Math.round(Math.random() * 200 + 25)
-		let b = Math.round(Math.random() * 200 + 25)
-		// check for grey color
-		if (Math.abs(g - r) < threshold) (g + offset) % 256
-		if (Math.abs(b - g) < threshold) (b + offset) % 256
+		// Multiply by the Golden Angle (~137.5 degrees)
+		// This distributes large, dispersed IDs evenly across the color wheel
+		// preventing "clustering" of colors.		
+		const h = Math.floor((userId * 137.508) % 360)
 
-		// check for color intensity
-		let a = r + g + b
-		if (a < 170) {
-			a = 170 / a
-			r *= a
-			g *= a
-			b *= a
-		}
+		// Lock Saturation and Lightness for good visibility
+		const s = 100
+		const l = 50
 
-		color = 'rgb(' + r + ',' + g + ',' + b + ')'
+		color = `hsl(${h}, ${s}%, ${l}%)`
 		user_color.set(userId, color)
 	}
 
