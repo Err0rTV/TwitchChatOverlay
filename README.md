@@ -14,7 +14,7 @@ TwitchChatOverlay is a simple HTML and JS file that displays your Twitch chat ov
    - Download the latest version of [TwitchChatOverlay](https://github.com/Err0rTV/TwitchChatOverlay/releases) and uncompress the file.
 
 2. **Get Your Twitch Chat Token:**
-   - Go to [Twitch Chat OAuth Token Generator](https://twitchapps.com/tmi/) to get your token.
+   - Go to [Twitch Activate Your Device](https://www.twitch.tv/activate) and enter the overlay code.
 
 3. **Configure in OBS:**
    - Add a new browser source in OBS.
@@ -26,31 +26,14 @@ TwitchChatOverlay is a simple HTML and JS file that displays your Twitch chat ov
     ```css
     .chat { 
         --chatbox-messagesHideDelay: 15;
-        --chatbox-token: oauth:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa;
     }
     ```
-5. Replace oauth:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa with your Twitch chat token.
-6. Click "OK".
-7. Optionaly start OBS with ```--disable-web-security``` to enable clip previews
+5. Click "OK".
+6. Optionaly start OBS with ```--disable-web-security``` to enable clip previews
 
 ## Configuration Parameters
 
 The `TwitchChatOverlay` allows for several configuration parameters to customize the behavior and appearance of the chat overlay. Below are the descriptions and usage for the two key parameters:
-
-### `--chatbox-token`
-
-**Description:**
-This parameter stores the OAuth token required to authenticate with the Twitch API and fetch chat messages. This token is essential for the overlay to function and display real-time chat messages.
-
-**Usage:**
-Replace the placeholder oauth:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa with your actual Twitch OAuth token obtained from the Twitch Chat OAuth Token Generator.
-
-**Example:**
-```css
-.chat {
-    --chatbox-token: oauth:your_actual_oauth_token_here;
-}
-```
 
 ### `--chatbox-messagesHideDelay`
 
@@ -70,7 +53,7 @@ If set to `0`, messages will never hide and will remain visible indefinitely.
 ```
 
 ## Acknowledgments
-- Thanks to Twitch Chat OAuth Token Generator for providing the token
 - Thanks to [tmi.js](https://tmijs.com/) for this amazing lib
 - Special thanks to [Urushiyowa](https://www.twitch.tv/urushiyowa), [Der_Richterrr](https://www.twitch.tv/der_richterrr) and [Zaktael](https://www.twitch.tv/zaktael) for their hours of support, feedback, and patches
 - And to everyone else who contributed to this project—thank you!
+- Thanks to Twitch Chat OAuth Token Generator to have provided the token for years

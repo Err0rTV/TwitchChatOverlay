@@ -2,6 +2,7 @@ import { twitch_botlist } from './botlist.js'
 import { Client } from 'tmi.js'
 import { toInt, getOption, escapeTag, choose_user_color } from './misc.js'
 import { add, delMsg } from './OBSTwitchChat.js'
+import { startDeviceFlow, getToken } from './twitch-auth.js'
 
 import { getBetterTTVEmoteImg } from './betterttv.js'
 import { getFFEmoteImg } from './frankerzface.js'
@@ -16,8 +17,8 @@ const annouceBadge = document.getElementById('announceBadge').innerHTML
 
 export var twitchCallback = new Object()
 
-export var token
-export var isTokenValid
+// var token
+var isTokenValid
 
 export var twitchUserInfo = {
 	user_id: '',
@@ -47,36 +48,32 @@ export function getTwitchGlobalBadge(key) {
 export async function initTwitch() {
 	testMode = toInt(getOption('testMode'), 0, 'testMode maybe 0, 1 or 2')
 
-	token = getOption('token')
-	if (token) {
-		if (token.startsWith('oauth:')) {
-			if (develop === 1) localStorage.setItem('twitchChatToken', token)
-		} else {
-			console.log('token should start with "oauth:"')
-			token = ''
-		}
-	} else token = localStorage.getItem('twitchChatToken')
-
+	let token = getToken()
 	if (token != '' && token != null) {
 		twitchUserInfo = await getUserInfos(token)
 		if (twitchUserInfo.status != 200) {
+			startDeviceFlow()
 			console.log('invalid token, please provide a valid token')
 		} else {
 			isTokenValid = true
 
 			return true
 		}
-	} else console.log('please provide a valid token')
+	} else {
+		console.log('please provide a valid token')
+		startDeviceFlow()
+	}
 	return false
 }
 
 export async function getChannelBadges(user_id) {
 	return new Promise((resolve, reject) => {
+		let token = getToken()
 		fetch(
 			`https://api.twitch.tv/helix/chat/badges?broadcaster_id=${twitchUserInfo.user_id}`,
 			{
 				headers: new Headers({
-					Authorization: 'Bearer ' + token.split(':')[1],
+					Authorization: 'Bearer ' + token,
 					'Client-Id': twitchUserInfo.client_id,
 				}),
 			}
@@ -103,9 +100,10 @@ export async function getChannelBadges(user_id) {
 
 export async function getGlobalBadges(user_id) {
 	return new Promise((resolve, reject) => {
+		let token = getToken()
 		fetch(`https://api.twitch.tv/helix/chat/badges/global`, {
 			headers: new Headers({
-				Authorization: 'Bearer ' + token.split(':')[1],
+				Authorization: 'Bearer ' + token,
 				'Client-Id': twitchUserInfo.client_id,
 			}),
 		})
@@ -144,6 +142,7 @@ export function start_chat(login, client_id) {
 			botmap.delete(e)
 		})
 
+	let token = getToken()
 	if (token != '') {
 		const client = new Client({
 			options: {
@@ -164,7 +163,7 @@ export function start_chat(login, client_id) {
 		})
 		client.connect().catch(console.error)
 
-		client.on('emotesets', (sets, obj) => {})
+		client.on('emotesets', (sets, obj) => { })
 
 		client.on('clearchat', (channel) => {
 			let ul = document.getElementById('test')
@@ -209,11 +208,12 @@ export function start_chat(login, client_id) {
 	if (testMode == 2) testannounce()
 }
 
-function getUserInfos(token) {
+function getUserInfos() {
+	let token = getToken()
 	let status
 	return fetch(`https://id.twitch.tv/oauth2/validate`, {
 		headers: new Headers({
-			Authorization: 'Bearer ' + token.split(':')[1],
+			Authorization: 'Bearer ' + token,
 		}),
 	})
 		.then((response) => {

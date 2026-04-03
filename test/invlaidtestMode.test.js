@@ -4,12 +4,12 @@ cpuppeteer = require('./cpuppeteer.js')
 describe.each([
 	[
 		'--chatbox-testMode: a;',
-		`--chatbox-token: ${process.env.TWITCH_TOKEN};`,
+		process.env.TWITCH_TOKEN,
 		['testMode maybe 0, 1 or 2'],
 	],
 	[
 		'--chatbox-testMode: aaa;',
-		`--chatbox-token: ${process.env.TWITCH_TOKEN};`,
+		process.env.TWITCH_TOKEN,
 		['testMode maybe 0, 1 or 2'],
 	],
 ])('', (testMode, token, expected) => {
@@ -18,10 +18,13 @@ describe.each([
 		puppet = new cpuppeteer()
 		await puppet.init(['--no-sandbox'])
 		await puppet.goto('../dist/OBSTwitchChat.html')
+		await puppet.page.evaluate((token) => {
+			localStorage.setItem('access_token', `${token}`);
+		}, token);
 		await puppet.page.addStyleTag({
 			content: `
 				.chat {
-				  ${testMode} ${token}
+				  ${testMode}
 			  }`,
 		})
 		await new Promise((r) => setTimeout(r, 5000))

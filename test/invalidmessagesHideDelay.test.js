@@ -6,24 +6,27 @@ describe.each([
 		[
 			'--chatbox-testMode: 1;',
 			'--chatbox-messagesHideDelay: aaa;',
-			`--chatbox-token: ${process.env.TWITCH_TOKEN};`,
 		],
+		process.env.TWITCH_TOKEN,
 		['messagesHideDelay should be an unsigned integer'],
 	],
 	[
 		[
 			'--chatbox-testMode: 2;',
 			'--chatbox-messagesHideDelay: a;',
-			`--chatbox-token: ${process.env.TWITCH_TOKEN};`,
 		],
+		process.env.TWITCH_TOKEN,
 		['messagesHideDelay should be an unsigned integer'],
 	],
-])('', (param, expected) => {
+])('', (param, token, expected) => {
 	var puppet
 	beforeAll(async () => {
 		puppet = new cpuppeteer()
 		await puppet.init(['--no-sandbox'])
 		await puppet.goto('../dist/OBSTwitchChat.html')
+		await puppet.page.evaluate((token) => {
+			localStorage.setItem('access_token', `${token}`);
+		}, token);
 		await puppet.page.addStyleTag({
 			content: `
 				.chat {

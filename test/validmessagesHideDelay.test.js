@@ -6,35 +6,40 @@ describe.each([
 		[
 			'--chatbox-testMode: 1;',
 			'--chatbox-messagesHideDelay: 0;',
-			`--chatbox-token: ${process.env.TWITCH_TOKEN};`,
 		],
+		`${process.env.TWITCH_TOKEN}`,
 		[],
 	],
 	[
 		[
 			'--chatbox-testMode: 2;',
 			'--chatbox-messagesHideDelay: 10;',
-			`--chatbox-token: ${process.env.TWITCH_TOKEN};`,
 		],
+		process.env.TWITCH_TOKEN,
 		[],
 	],
 	[
-		['--chatbox-testMode: 2;', `--chatbox-token: ${process.env.TWITCH_TOKEN};`],
+		['--chatbox-testMode: 2;'
+		], 
+		process.env.TWITCH_TOKEN,
 		[],
 	],
-])('', (param, expected) => {
+])('', (param, token, expected) => {
 	var puppet
 	beforeAll(async () => {
 		puppet = new cpuppeteer()
 		await puppet.init(['--no-sandbox'])
 		await puppet.goto('../dist/OBSTwitchChat.html')
+		await puppet.page.evaluate((_token) => {
+			localStorage.setItem('access_token', `${_token}`);
+		}, token);
 		await puppet.page.addStyleTag({
 			content: `
 				.chat {
 				  ${param.join(' ')}
 			  }`,
 		})
-		await new Promise((r) => setTimeout(r, 5000))
+		await new Promise((r) => setTimeout(r, 1000))
 	}, 90 * 1000)
 
 	test(`le message dans la console doit être "${expected}"`, async () => {

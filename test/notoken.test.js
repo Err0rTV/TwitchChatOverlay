@@ -10,10 +10,13 @@ describe.each([
 		puppet = new cpuppeteer()
 		await puppet.init(['--no-sandbox'])
 		await puppet.goto('../dist/OBSTwitchChat.html')
+		await puppet.page.evaluate((token) => {
+			localStorage.setItem('access_token', `${token}`);
+		}, token);
 		await puppet.page.addStyleTag({
 			content: `
 				.chat {
-				  ${testMode} ${token}
+				  ${testMode}
 			  }`,
 		})
 		await new Promise((r) => setTimeout(r, 5000))
