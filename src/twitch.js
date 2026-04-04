@@ -2,7 +2,7 @@ import { twitch_botlist } from './botlist.js'
 import { Client } from 'tmi.js'
 import { toInt, getOption, escapeTag, choose_user_color } from './misc.js'
 import { add, delMsg } from './OBSTwitchChat.js'
-import { startDeviceFlow, getToken, startChat } from './twitch-auth.js'
+import { getToken, startChat } from './twitch-auth.js'
 
 import { getBetterTTVEmoteImg } from './betterttv.js'
 import { getFFEmoteImg } from './frankerzface.js'
@@ -538,7 +538,7 @@ export async function fetchClipUrl(message) {
 
 		for (let c = 1; c <= 3; c++) {
 			let response = await fetch(`https://clips.twitch.tv/${slug}`).catch(
-				(error) => {}
+				(error) => { }
 			)
 
 			if (response == undefined) {
