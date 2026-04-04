@@ -2,7 +2,7 @@ import { twitch_botlist } from './botlist.js'
 import { Client } from 'tmi.js'
 import { toInt, getOption, escapeTag, choose_user_color } from './misc.js'
 import { add, delMsg } from './OBSTwitchChat.js'
-import { startDeviceFlow, getToken } from './twitch-auth.js'
+import { startDeviceFlow, getToken, startChat } from './twitch-auth.js'
 
 import { getBetterTTVEmoteImg } from './betterttv.js'
 import { getFFEmoteImg } from './frankerzface.js'
@@ -48,20 +48,13 @@ export function getTwitchGlobalBadge(key) {
 export async function initTwitch() {
 	testMode = toInt(getOption('testMode'), 0, 'testMode maybe 0, 1 or 2')
 
+	await startChat()
 	let token = getToken()
 	if (token != '' && token != null) {
 		twitchUserInfo = await getUserInfos(token)
-		if (twitchUserInfo.status != 200) {
-			startDeviceFlow()
-			console.log('invalid token, please provide a valid token')
-		} else {
-			isTokenValid = true
-
+		if (twitchUserInfo.status == 200) {
 			return true
 		}
-	} else {
-		console.log('please provide a valid token')
-		startDeviceFlow()
 	}
 	return false
 }
