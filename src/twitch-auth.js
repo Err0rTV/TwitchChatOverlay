@@ -137,6 +137,19 @@ const SCOPES = 'chat:read channel:manage:clips';
 const AUTH_BASE = 'https://id.twitch.tv/oauth2';
 const VALIDATE_URL = 'https://id.twitch.tv/oauth2/validate';
 
+const channel = new BroadcastChannel('reload_channel');
+channel.onmessage = (event) => {
+  if (event.data === 'reload') {
+    console.log("Received reload message, reloading page...");
+    location.reload();
+  }
+};
+
+function reloadChatBoxs() {
+  channel.postMessage('reload');
+  setTimeout(() => location.reload(), 50);
+}
+
 // Helper for logging with timestamps
 function log(msg) {
   const time = new Date().toISOString().split('T')[1].slice(0, -1);
@@ -203,6 +216,7 @@ async function refreshAccessToken(refreshToken) {
   } catch (e) {
     console.error(e);
     deleteTokens();
+    reloadChatBoxs();
     return null;
   }
 }
@@ -253,6 +267,7 @@ export async function startDeviceFlow() {
         saveTokens(pollData.access_token, pollData.refresh_token);
         loginUI.setVisible(false);
         startChat(pollData.access_token);
+        reloadChatBoxs();
       } else if (pollData.message === 'expired_token') {
         clearInterval(interval);
         alert("Code expired. Please reload the page.");
