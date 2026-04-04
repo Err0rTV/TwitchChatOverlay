@@ -202,7 +202,7 @@ async function refreshAccessToken(refreshToken) {
     return data;
   } catch (e) {
     console.error(e);
-    localStorage.clear();
+    deleteTokens();
     return null;
   }
 }
@@ -273,6 +273,12 @@ export function saveTokens(access, refresh) {
 
 export function getToken() {
   return localStorage.getItem('access_token')
+}
+
+function deleteTokens() {
+  localStorage.removeItem('access_token');
+  localStorage.removeItem('refresh_token');
+  log("   -> Tokens deleted from LocalStorage.");
 }
 
 // --- MAIN LOGIC ---
