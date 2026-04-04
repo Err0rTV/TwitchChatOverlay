@@ -152,31 +152,54 @@ function reloadChatBoxs() {
 
 // Helper for logging with timestamps
 function log(msg) {
+  // return; // Disable logs for now
   const time = new Date().toISOString().split('T')[1].slice(0, -1);
   console.log(`[${time}] ${msg}`);
 }
 
+export let isTokenValid = false;
 export async function startChat() {
+  const storedRefresh = getRefreshToken();
 
-  async function localTokenCheck() {
-    const storedAccess = localStorage.getItem('access_token');
-    if (!storedAccess) {
-      log("No access token found during periodic check.");
-      reloadChatBoxs();
-    }
-    let expires_in = await validateToken(storedAccess)
-
-    if (expires_in < 10000) {
-      log("expired token")
-      const storedRefresh = localStorage.getItem('refresh_token');
-      refreshAccessToken(storedRefresh)
-    }
-    else {
-      log("Token still valid")
-    }
+  if (!storedRefresh) {
+    return startDeviceFlow();
   }
-  await localTokenCheck() // Check immediately on start
-  setInterval(localTokenCheck, 60000)
+
+  // Initial setup
+  monitorToken(storedRefresh);
+}
+
+async function monitorToken(refreshToken) {
+  while (true) {
+    try {
+      let currentAccess = getToken();
+
+      if (!currentAccess) {
+        log("Access token missing, refreshing...");
+        await refreshAccessToken(refreshToken);
+        currentAccess = getToken();
+      }
+
+      const expiresInSeconds = await validateToken(currentAccess);
+
+      // A 10-minute buffer (600s) is standard and safe
+      if (expiresInSeconds < 600) {
+        log("Token expiring soon, refreshing...");
+        await refreshAccessToken(refreshToken);
+      } else {
+        log(`Token valid for ${Math.round(expiresInSeconds / 60)} more minutes.`);
+      }
+    } catch (error) {
+      log("Auth loop encountered an error:", error);
+      // If the refresh token itself is revoked, you MUST break and re-auth
+      if (error.status === 401) {
+        return startDeviceFlow();
+      }
+    }
+
+    // Wait 1 minute before checking again
+    await new Promise(resolve => setTimeout(resolve, 60000));
+  }
 }
 
 // --- OAUTH FUNCTIONS ---
@@ -202,6 +225,12 @@ async function validateToken(token) {
 }
 
 async function refreshAccessToken(refreshToken) {
+  if (!refreshToken) {
+    console.log("No refresh token available for refresh attempt.");
+    deleteTokens();
+    reloadChatBoxs();
+    return null;
+  }
   try {
     log("   -> Sending Refresh request...");
     const params = new URLSearchParams();
@@ -215,15 +244,20 @@ async function refreshAccessToken(refreshToken) {
       body: params
     });
 
-    if (!res.ok) throw new Error('Refresh request failed');
-
+    if (!res.ok) {
+      // If the server explicitly says the token is bad
+      if (res.status === 400 || res.status === 401) {
+        deleteTokens();
+        reloadChatBoxs();
+      }
+      throw new Error(`Refresh failed: ${res.status}`);
+    }
     const data = await res.json();
-    saveTokens(data.access_token, data.refresh_token);
+    saveTokens(data.access_token, data.refresh_token || refreshToken);
+    isTokenValid = true;
     return data;
   } catch (e) {
-    console.error(e);
-    deleteTokens();
-    reloadChatBoxs();
+    console.error("Refresh Error:", e);
     return null;
   }
 }
@@ -294,6 +328,10 @@ export function saveTokens(access, refresh) {
 
 export function getToken() {
   return localStorage.getItem('access_token')
+}
+
+export function getRefreshToken() {
+  return localStorage.getItem('refresh_token')
 }
 
 function deleteTokens() {
