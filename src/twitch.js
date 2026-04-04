@@ -478,11 +478,6 @@ async function showMsg(twitchMsg) {
 		.content.firstElementChild.cloneNode(true) //.namedItem("contener").cloneNode(true)
 
 	if (messagebox != null) {
-		let text = messagebox.getElementsByClassName('text')[0]
-		text.style.color = twitchMsg.userstate.color
-			? twitchMsg.userstate.color
-			: choose_user_color(twitchMsg.userstate['user-id'])
-
 		let username = document.createElement('span')
 		if (twitchMsg.userstate['user-id'] == '741565995') {
 			username.append(
