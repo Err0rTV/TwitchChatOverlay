@@ -156,9 +156,14 @@ function log(msg) {
   console.log(`[${time}] ${msg}`);
 }
 
-async function startChat() {
-  setInterval(async () => {
+export async function startChat() {
+
+  async function localTokenCheck() {
     const storedAccess = localStorage.getItem('access_token');
+    if (!storedAccess) {
+      log("No access token found during periodic check.");
+      reloadChatBoxs();
+    }
     let expires_in = await validateToken(storedAccess)
 
     if (expires_in < 10000) {
@@ -169,7 +174,9 @@ async function startChat() {
     else {
       log("Token still valid")
     }
-  }, 60000)
+  }
+  await localTokenCheck() // Check immediately on start
+  setInterval(localTokenCheck, 60000)
 }
 
 // --- OAUTH FUNCTIONS ---
