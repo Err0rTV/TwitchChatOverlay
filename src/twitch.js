@@ -17,9 +17,6 @@ const annouceBadge = document.getElementById('announceBadge').innerHTML
 
 export var twitchCallback = new Object()
 
-// var token
-var isTokenValid
-
 export var twitchUserInfo = {
 	user_id: '',
 	login: '',
@@ -258,11 +255,9 @@ async function testmsg() {
 		self: false,
 	}
 
-	if (isTokenValid) {
-		testMsg.userstate.badges = {
-			broadcaster: '1',
-			subscriber: '12',
-		}
+	testMsg.userstate.badges = {
+		broadcaster: '1',
+		subscriber: '12',
 	}
 
 	showMsg(testMsg)
@@ -310,11 +305,9 @@ async function testannounce() {
 		color: 'PRIMARY',
 	}
 
-	if (isTokenValid) {
-		testMsg.userstate.badges = {
-			broadcaster: '1',
-			subscriber: '12',
-		}
+	testMsg.userstate.badges = {
+		broadcaster: '1',
+		subscriber: '12',
 	}
 
 	showMsg(testMsg)
