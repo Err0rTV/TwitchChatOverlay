@@ -131,7 +131,7 @@ customElements.define('twitch-auth', TwitchAuth);
 
 // --- CONFIGURATION ---
 const CLIENT_ID = 'y137vl5dm6gtj8tcfliqkjebqwn125';
-const SCOPES = 'chat:read channel:manage:clips';
+const SCOPES = 'chat:read';
 
 // --- ENDPOINTS ---
 const AUTH_BASE = 'https://id.twitch.tv/oauth2';
