@@ -190,7 +190,7 @@ async function validateToken(token) {
     let json = await res.json()
     log(`   -> Twitch response received (Status: ${res.status})`);
     if (res.status === 200) {
-      log(`   -> Twitch response received (Status: ${json.expires_in})`);
+      log(`   -> Twitch Token Expires In ${json.expires_in} seconds`);
       return json.expires_in
     }
     else
