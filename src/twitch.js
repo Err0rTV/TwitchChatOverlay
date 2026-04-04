@@ -547,6 +547,7 @@ export async function fetchClipUrl(message) {
 				m = m.match(/content="(.*?)"/)
 				if (m) {
 					url = m[1].replace('-social-preview.jpg', '.mp4')
+					url = url.replace('https://static-cdn.jtvnw.net/twitch-clips/', 'https://clips-media-assets2.twitch.tv/')
 					// console.log(url)
 					return url
 				}
