@@ -229,7 +229,6 @@ async function refreshAccessToken(refreshToken) {
 }
 
 export async function startDeviceFlow() {
-//  const loginUI = document.getElementById('myLogin');
   let loginUI = document.createElement("twitch-auth")
   document.body.append(loginUI)
 
