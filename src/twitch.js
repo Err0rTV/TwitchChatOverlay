@@ -420,6 +420,8 @@ async function showMsg(twitchMsg) {
 						if (emote == e.start + '-' + e.end) {
 							e.type = 'emote'
 							e.img = `https://static-cdn.jtvnw.net/emoticons/v2/${emotes[0]}/default/dark/3.0`
+							if (twitchMsg.userstate['msg-id'] == "gigantified-emote-message")
+								e.class = "gigantified"
 							break
 						}
 					}
@@ -442,6 +444,8 @@ async function showMsg(twitchMsg) {
 				let img = document.createElement('img')
 				img.src = e.img
 				img.classList.add('chatEmote')
+				if (Object.hasOwn(e, 'class') && e.class == "gigantified") 
+					img.classList.add("gigantified")
 				message.appendChild(img)
 			}
 		}
