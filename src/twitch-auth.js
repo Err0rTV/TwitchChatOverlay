@@ -128,6 +128,7 @@ export class TwitchAuth extends HTMLElement {
 // Register the custom element
 customElements.define('twitch-auth', TwitchAuth);
 
+import './weblocks-polyfill.js';
 
 // --- CONFIGURATION ---
 const CLIENT_ID = 'y137vl5dm6gtj8tcfliqkjebqwn125';
@@ -165,8 +166,31 @@ export async function startChat() {
     return startDeviceFlow();
   }
 
-  // Initial setup
-  monitorToken(storedRefresh);
+  // 1. Force a check on startup to make sure we have a valid token right now
+  await navigator.locks.request('twitch_token_initial_check', { mode: 'exclusive' }, async (lock) => {
+    log("Initial token check: Lock acquired.");
+    let currentAccess = getToken();
+    let expiresInSeconds = await validateToken(currentAccess);
+
+    if (expiresInSeconds < 600) {
+      log("Token expired on startup, refreshing before connecting...");
+      const newTokens = await refreshAccessToken(storedRefresh);
+      if (!newTokens) return startDeviceFlow();
+    } else {
+      isTokenValid = true;
+    }
+  });
+
+  // 2. Start the background monitoring loop
+  log("Attempting to acquire Leader lock...");
+
+  // The browser guarantees only ONE window will ever execute the code inside this callback at a time.
+  // Other windows will silently wait at this line until the active Leader dies.
+  navigator.locks.request('twitch_token_leader', { mode: 'exclusive' }, async (lock) => {
+    log("Leader Mode: Lock acquired! I am taking over token management.");
+    await monitorToken(storedRefresh);
+  });
+
 }
 
 async function monitorToken(refreshToken) {
